@@ -90,7 +90,7 @@ Développer une version moderne du jeu Maze Wars en utilisant Rust et le moteur 
 ## 4. Planification et structure du projet
 
 ### 4.1 Structure des dossiers
-```
+``` bash
 src/
 ├── bin/
 │   ├── client.rs
@@ -108,6 +108,38 @@ src/
     ├── physics/
     └── session/
 ```
+```bash
+src/
+├── bin/
+│   ├── client.rs          # Point d'entrée pour le client.
+│   └── server.rs          # Point d'entrée pour le serveur.
+├── common/                # Code partagé entre client et serveur.
+│   ├── network/           # Gestion réseau.
+│   │   ├── protocol.rs    # Définitions des messages réseau.
+│   │   ├── udp.rs         # Implémentation des connexions UDP avec Tokio.
+│   └── types/             # Types et structures partagés.
+│       ├── game_state.rs  # État global partagé du jeu.
+│       └── entities.rs    # Structures pour les joueurs, labyrinthes, etc.
+├── client/                # Code spécifique au client.
+│   ├── graphics/          # Rendu et affichage.
+│   │   ├── rendering.rs   # Rendu principal avec Bevy.
+│   │   └── ui.rs          # HUD (mini-carte, FPS, etc.).
+│   ├── input/             # Gestion des entrées utilisateur.
+│   │   └── input_handler.rs # Déplacement, interactions.
+│   └── state/             # Gestion des états côté client.
+│       └── client_state.rs # État local du client.
+└── server/                # Code spécifique au serveur.
+    ├── game_logic/        # Logique centrale du jeu.
+    │   ├── maze.rs        # Génération procédurale de labyrinthes avec Rand.
+    │   ├── levels.rs      # Gestion des niveaux et difficulté.
+    │   └── player_logic.rs # Gestion des joueurs.
+    ├── physics/           # Physique avec Rapier3D.
+    │   └── collision.rs   # Détection et gestion des collisions.
+    └── session/           # Gestion des sessions de jeu.
+        ├── session_manager.rs # Connexions des joueurs et parties actives.
+        └── events.rs      # Gestion des événements du jeu.
+```
+
 
 ### 4.2 Dépendances principales
 ```toml
