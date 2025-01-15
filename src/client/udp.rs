@@ -1,14 +1,9 @@
-use std::io::{self, Write,};
-use std::net::SocketAddr;
-use std::sync::Arc;
-use tokio::net::UdpSocket;
-use multiplayer_fps::common::network::protocol::Message;
 pub struct Client {
     name: String,
 }
 
 impl Client {
-    pub fn new(name: String) -> Self {
+    fn new(name: String) -> Self {
         Client { name }
     }
 
@@ -66,17 +61,20 @@ impl Client {
         io::stdin().read_line(&mut name).unwrap();
         let name = name.trim().to_string();
     
+
+
         print!("Entrez l'adresse du serveur (ex: 0.0.0.0:8080) : ");
         io::stdout().flush().unwrap();
     
         let mut address = String::new();
         io::stdin().read_line(&mut address).unwrap();
-        let server_address: SocketAddr = address.trim().parse::<SocketAddr>().expect("Adresse invalide.");
+        let server_address: SocketAddr = address.trim().parse().expect("Adresse invalide.");
     
         println!(
-            "Connexion au serveur {} avec le nom {}...",
+            "Tentative de connexion au serveur {} avec le nom {}...",
             server_address, name
         );
+
         let serv = Self::new(name);
         let runtime = tokio::runtime::Runtime::new().unwrap();
         runtime.block_on(serv.run(server_address)).unwrap();

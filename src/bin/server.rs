@@ -6,13 +6,13 @@ pub struct Server {
 }
 
 impl Server {
-    pub fn new() -> Self {
+    fn new() -> Self {
         Server {
             clients: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 
-    pub async fn run(&self, ip_addr: SocketAddr) -> io::Result<()> {
+    async fn run(&self, ip_addr: SocketAddr) -> io::Result<()> {
         let sock = UdpSocket::bind(ip_addr).await?;
         println!("Serveur écoute sur {}", ip_addr);
 
@@ -70,4 +70,9 @@ impl Server {
         let runtime = tokio::runtime::Runtime::new().unwrap();
         runtime.block_on(serv.run(server_address)).unwrap();
     }
+}
+
+
+fn main() {
+    Server::start_server();
 }
