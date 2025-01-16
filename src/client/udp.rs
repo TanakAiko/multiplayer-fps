@@ -1,3 +1,15 @@
+use std::io::{self, Write};
+use std::net::SocketAddr;
+use std::sync::Arc;
+use tokio::net::UdpSocket;
+
+use crate::common::network::protocol::Message;
+
+
+
+
+
+
 pub struct Client {
     name: String,
 }
@@ -11,7 +23,7 @@ impl Client {
         // Créer et connecter le socket
         let sock = UdpSocket::bind("0.0.0.0:0").await?;
         sock.connect(remote_addr).await?;
-        println!("Client connecté au serveur: {}", remote_addr);
+        // println!("Client connecté au serveur: {}", remote_addr);
 
         // Créer un Arc pour partager le socket
         let sock = Arc::new(sock);
