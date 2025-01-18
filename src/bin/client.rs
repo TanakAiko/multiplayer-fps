@@ -1,71 +1,32 @@
-use multiplayer_fps::client::udp::Client;
 use bevy::prelude::*;
-
-#[derive(Debug, Component)]
-struct Velocity {
-    pub value: Vec3
-}
-
-pub struct SpaceshipPlugin;
-
-impl Plugin for SpaceshipPlugin {
-    fn build(&self, app: &mut App) {
-        app
-            .add_systems(Startup, spawn_spaceship)
-            .add_systems(Update, (update_position, print_position));
-    }
-}
-
-fn spawn_spaceship(mut commands: Commands) {
-    commands
-        .spawn(
-            (
-                Transform::default(),
-                Velocity {
-                    value: Vec3::new(1., 1., 1.)
-                }
-            )
-        );
-}
-
-pub struct MovementPlugin;
-
-impl Plugin for MovementPlugin {
-    fn build(&self , app: &mut App){
-        app.add_systems(Update, update_position);
-    }
-}
-
-pub struct DebugPlugin;
-
-impl Plugin for DebugPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(Update, print_position);    
-    }
-}
-
-
-// System Query
-fn update_position(mut query: Query<(&Velocity, &mut Transform)>) {
-    for (velocity, mut position) in query.iter_mut() {
-        position.translation.x += velocity.value.x;
-        position.translation.y += velocity.value.y;
-        position.translation.z += velocity.value.z;
-    }
-}
-
-fn print_position(query: Query<(Entity, &Transform)>) {
-    for (entity, transform) in query.iter() {
-        info!("Entity {:?} is at pos {:?}", entity, transform.translation)
-    }
-}
+use multiplayer_fps::client::{
+    resources::network::{handle_network_messages, input_connexion, NetworkResource},
+    udp::Client,
+};
+use std::sync::Arc;
+use tokio::runtime::Runtime;
 
 fn main() {
-    Client::start_client();
-    
+    // Créer le runtime une seule fois
+    let runtime = Runtime::new().unwrap();
+
+    let (name, server_address) = input_connexion();
+
+    // Établir la connexion et obtenir le socket
+    let socket = runtime.block_on(async {
+        let client = Client::new(name);
+        client
+            .connect(server_address)
+            .await
+            .expect("Échec de la connexion")
+    });
+
+    // Une fois connecté, démarrer Bevy
     App::new()
-    .add_systems(Startup, spawn_spaceship)
-    .add_systems(Update, (update_position, print_position))
-    .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins)
+        .insert_resource(NetworkResource {
+            socket: Arc::new(socket),
+        })
+        .add_systems(Update, handle_network_messages)
         .run();
 }
