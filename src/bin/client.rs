@@ -1,7 +1,6 @@
 use bevy::prelude::*;
 use multiplayer_fps::client::{
-    resources::network::{handle_network_messages, input_connexion, NetworkResource},
-    udp::Client,
+    plugins::player::PlayerPlugin, resources::network::{handle_network_messages, input_connexion, NetworkResource}, udp::Client
 };
 use std::sync::Arc;
 use tokio::runtime::Runtime;
