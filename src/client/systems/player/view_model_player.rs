@@ -1,6 +1,6 @@
 use bevy::{color::palettes::tailwind, pbr::NotShadowCaster, prelude::*, render::view::RenderLayers};
 
-use crate::client::systems::camera::setup::VIEW_MODEL_RENDER_LAYER;
+use crate::client::systems::camera::setup_camera::VIEW_MODEL_RENDER_LAYER;
 
 // C'est la qu'on dessine le player 
 pub fn spawn_view_model(

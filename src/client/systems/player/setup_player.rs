@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 
-use crate::client::{components::{camera::CameraSensitivity, player::Player}, systems::camera::{view_model::spawn_view_model_camera, world_model::spawn_main_camera}};
+use crate::client::{components::{camera_component::CameraSensitivity, player_component::Player}, systems::camera::{view_model_camera::spawn_view_model_camera, world_model_camera::spawn_main_camera}};
 
-use super::view_model::spawn_view_model;
+use super::view_model_player::spawn_view_model;
 
 // Le player instancie les camera comme enfant
 

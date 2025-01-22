@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::client::systems::{light::{self, spawn_light}, player::setup::setup};
+use crate::client::systems::{light_system::spawn_light, player::setup_player::setup};
 
 pub struct PlayerPlugin;
 

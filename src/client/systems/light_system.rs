@@ -1,6 +1,6 @@
 use bevy::{color::palettes::tailwind, prelude::*, render::view::RenderLayers};
 
-use super::camera::setup::{DEFAULT_RENDER_LAYER, VIEW_MODEL_RENDER_LAYER};
+use super::camera::setup_camera::{DEFAULT_RENDER_LAYER, VIEW_MODEL_RENDER_LAYER};
 
 pub fn spawn_light(mut commands: Commands) {
     commands.spawn((
