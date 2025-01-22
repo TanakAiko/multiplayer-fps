@@ -24,6 +24,7 @@ fn main() {
     // Une fois connecté, démarrer Bevy
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_plugins(PlayerPlugin)
         .insert_resource(NetworkResource {
             socket: Arc::new(socket),
         })
