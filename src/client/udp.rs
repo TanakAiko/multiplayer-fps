@@ -35,29 +35,35 @@ impl Client {
     }
 
     pub async fn connect(&self, remote_addr: SocketAddr) -> Result<UdpSocket, ClientError> {
-        // Créer et connecter le socket
+        // Créer le socket local
         let sock = UdpSocket::bind("0.0.0.0:0").await?;
-        
-        // Ajouter un timeout de 15 secondes pour la connexion
-        match timeout(Duration::from_secs(15), sock.connect(remote_addr)).await {
-            Ok(result) => result?,
-            Err(_) => return Err(ClientError::ConnectionTimeout),
-        }
-        
-        // Envoyer le message de connexion avec timeout
-        let join_message = Message::Join {
+        sock.connect(remote_addr).await?;
+    
+        // Envoyer un message de test et attendre la réponse pour vérifier que le serveur est actif
+        let test_message = Message::Join {
             name: self.name.clone(),
         };
-        let encoded = bincode::serialize(&join_message)?;
-        
-        match timeout(Duration::from_secs(15), sock.send(&encoded)).await {
+        let encoded = bincode::serialize(&test_message)?;
+    
+        // Envoyer le message avec timeout
+        match timeout(Duration::from_secs(5), sock.send(&encoded)).await {
             Ok(result) => result?,
             Err(_) => return Err(ClientError::ServerNotResponding),
         };
-
-        Ok(sock)
+    
+        // Attendre une réponse du serveur
+        let mut buffer = [0u8; 1024];
+        match timeout(Duration::from_secs(5), sock.recv(&mut buffer)).await {
+            Ok(result) => {
+                match result {
+                    Ok(_) => Ok(sock), // Si on reçoit une réponse, le serveur est actif
+                    Err(_) => Err(ClientError::ServerNotResponding),
+                }
+            },
+            Err(_) => Err(ClientError::ServerNotResponding),
+        }
     }
-
+    
     // pub fn start_client() {
     //     print!("Entrez votre nom : ");
     //     match io::stdout().flush() {
