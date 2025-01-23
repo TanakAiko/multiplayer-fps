@@ -9,27 +9,44 @@ pub fn spawn_world_model(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
 
-    // println!("{:?}", load_maze_from_json("./src/client/maze.json"));
-
-    /* let cube= meshes.add(Cuboid::new(2., 0.5, 1.));
-    let floor = meshes.add(Plane3d::new(Vec3::Y, Vec2::splat(10.)));
+    let maze = load_maze_from_json("maze.json");
+    let floor = meshes.add(Plane3d::new(Vec3::Y, Vec2::splat(30.)));
+    let mur = meshes.add(Cuboid::new(1.0, 4.0, 0.2));
     let material = materials.add(Color::WHITE);
+    commands
+        .spawn((
+            Mesh3d(floor.clone()),
+            MeshMaterial3d(material.clone()),
+            Transform::from_xyz(0.2, 0., 0.5),
+        ));
 
+    // Définir les dimensions des tuiles
+    let tile_size = 1.0;
 
-    commands.spawn((
-        Mesh3d(floor),
-        MeshMaterial3d(material.clone())
-    ));
+    for (z, row) in maze.iter().enumerate() {
+        for (x, &cell) in row.iter().enumerate() {
+            // Calculer la position 3D
+            let position = Vec3::new(x as f32 * tile_size, 0.0, z as f32 * tile_size);
 
-    commands.spawn((
-        Mesh3d(cube.clone()),
-        MeshMaterial3d(material.clone()),
-        Transform::from_xyz(0.0, 0.25, -3.0),
-    ));
-
-    commands.spawn((
-        Mesh3d(cube),
-        MeshMaterial3d(material.clone()),
-        Transform::from_xyz(0.75, 2., 0.0),
-    )); */
+            match cell {
+                'b' => {
+                    // Mur (cube solide)
+                    commands
+                    .spawn((
+                        Mesh3d(mur.clone()),
+                        MeshMaterial3d(material.clone()),
+                        Transform::from_translation(position),
+                    ));
+                }
+                'c' => {
+                    // Sol (chemin libre)
+                }
+                'm' => {
+                    // Obstacle ou chemin particulier
+                    
+                }
+                _ => {}
+            }
+        }
+    }
 }
