@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use multiplayer_fps::client::{
-    plugins::player_plugin::PlayerPlugin, resources::network_resource::{handle_network_messages, input_connexion, NetworkResource}, udp::Client
+    plugins::{player_plugin::PlayerPlugin, world_plugin::WorldPlugin}, resources::network_resource::{handle_network_messages, input_connexion, NetworkResource}, udp::Client
 };
 // use std::sync::Arc;
 // use tokio::runtime::Runtime;
@@ -12,15 +12,6 @@ fn main() {
     // let (name, server_address) = input_connexion();
 
     // Établir la connexion et obtenir le socket
-<<<<<<< Updated upstream
-    let socket = runtime.block_on(async {
-        let client = Client::new(name);
-        match client.connect(server_address).await {
-            Ok(so) => so,
-            Err(e) =>  panic!("Error: {}", e)
-        }
-    });
-=======
     // let socket = runtime.block_on(async {
     //     let client = Client::new(name);
     //     client
@@ -28,12 +19,15 @@ fn main() {
     //         .await
     //         .expect("Échec de la connexion")
     // });
->>>>>>> Stashed changes
 
     // Une fois connecté, démarrer Bevy
     App::new()
-        .add_plugins(DefaultPlugins)
-        .add_plugins(PlayerPlugin)
+        .add_plugins((
+            DefaultPlugins,
+            PlayerPlugin,
+            WorldPlugin,
+        ))
+        // .add_plugins(PlayerPlugin)
         // .insert_resource(NetworkResource {
         //     socket: Arc::new(socket),
         // })

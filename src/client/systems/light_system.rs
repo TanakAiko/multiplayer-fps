@@ -5,7 +5,7 @@ use super::camera::setup_camera::{DEFAULT_RENDER_LAYER, VIEW_MODEL_RENDER_LAYER}
 pub fn spawn_light(mut commands: Commands) {
     commands.spawn((
         PointLight {
-            color:  Color::from(tailwind::ORANGE_200),
+            // color:  Color::from(tailwind::ORANGE_200),
             shadows_enabled: true,
             ..default()
         },
