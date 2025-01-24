@@ -17,7 +17,7 @@ pub fn spawn_world_model(
         .spawn((
             Mesh3d(floor.clone()),
             MeshMaterial3d(material.clone()),
-            Transform::from_xyz(0.2, 0., 0.5),
+            Transform::from_xyz(0.2, -2., 0.5),
         ));
 
     // Définir les dimensions des tuiles
