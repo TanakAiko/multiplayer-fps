@@ -14,10 +14,6 @@ fn main() {
     // Établir la connexion et obtenir le socket
     // let socket = runtime.block_on(async {
     //     let client = Client::new(name);
-    //     client
-    //         .connect(server_address)
-    //         .await
-    //         .expect("Échec de la connexion")
     // });
 
     // Une fois connecté, démarrer Bevy
