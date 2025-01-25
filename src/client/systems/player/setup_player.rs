@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_rapier3d::prelude::*;
 
 use crate::client::{
     components::{camera_component::CameraSensitivity, player_component::Player},
@@ -16,7 +17,7 @@ use super::{move_player::{AccumulatedInput, PhysicalTranslation, PreviousPhysica
      (position, rotation, etc.) et sert de conteneur pour
       d'autres composants comme les caméras.
 */
-
+// setup_player
 fn spawn_player(commands: &mut Commands) -> Entity {
     commands
         .spawn((
@@ -29,6 +30,8 @@ fn spawn_player(commands: &mut Commands) -> Entity {
             Transform::from_xyz(0., 5., 0.),
             GlobalTransform::default(),
             Visibility::default(),
+            Collider::ball(0.5),
+            RigidBody::Dynamic,
         ))
         .id()
 }

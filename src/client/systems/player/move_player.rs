@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+// Une structure utilisée pour accumuler les actions du joueur, comme des 
+// pressions sur des touches, des mouvements de souris, etc. 
 #[derive(Debug, Component, Clone, Copy, PartialEq, Default, Deref, DerefMut)]
 pub struct AccumulatedInput(pub Vec2);
 
@@ -38,16 +40,16 @@ pub fn handle_input(
         *input = AccumulatedInput(Vec2::ZERO);
 
         // Mouvements directionnels basés sur l'orientation de la caméra
-        if keyboard_input.pressed(KeyCode::KeyW) {
+        if keyboard_input.pressed(KeyCode::KeyW) || keyboard_input.pressed(KeyCode::ArrowUp) {
             input.y += 1.0;
         }
-        if keyboard_input.pressed(KeyCode::KeyS) {
+        if keyboard_input.pressed(KeyCode::KeyS) || keyboard_input.pressed(KeyCode::ArrowDown) {
             input.y -= 1.0;
         }
-        if keyboard_input.pressed(KeyCode::KeyA) {
+        if keyboard_input.pressed(KeyCode::KeyA) || keyboard_input.pressed(KeyCode::ArrowLeft) {
             input.x -= 1.0;
         }
-        if keyboard_input.pressed(KeyCode::KeyD) {
+        if keyboard_input.pressed(KeyCode::KeyD) || keyboard_input.pressed(KeyCode::ArrowRight) {
             input.x += 1.0;
         }
 

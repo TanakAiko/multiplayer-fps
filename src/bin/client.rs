@@ -16,6 +16,7 @@ fn main() {
     //     let client = Client::new(name);
     // });
 
+
     // Une fois connecté, démarrer Bevy
     App::new()
         .add_plugins((
