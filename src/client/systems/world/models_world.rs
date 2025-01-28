@@ -1,69 +1,19 @@
 use bevy::{color::palettes::tailwind, prelude::*};
 use bevy_rapier3d::prelude::*;
 
-use crate::client::systems::world::load_json_world::{self, load_maze_from_json};
-
-/* pub fn spawn_world_model(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-) {
-    let maze = load_maze_from_json("maze.json");
-    let max_len = if maze.len() > maze[0].len() {
-        maze.len()
-    } else {
-        maze[0].len()
-    };
-    let floor = meshes.add(Plane3d::new(Vec3::Y, Vec2::splat(max_len as f32)));
-    let wall = meshes.add(Cuboid::new(0.3, 3.0, 0.3));
-    let material = materials.add(Color::from(tailwind::GRAY_400));
-    let wall_material = materials.add(Color::from(tailwind::ORANGE_400));
-    // setup le sol
-    commands.spawn((
-        Mesh3d(floor.clone()),
-        MeshMaterial3d(material.clone()),
-        Transform::from_xyz(-1.*max_len as f32 +1., -1., -1.*max_len as f32 +1.), // ajustement manuel
-    ));
-
-    let tile_size = 0.3;
-
-    for (z, row) in maze.iter().enumerate() {
-        for (x, &cell) in row.iter().enumerate() {
-            // Calculer la position 3D
-            let position = Vec3::new(x as f32 * tile_size, 0.0, z as f32 * tile_size);
-
-            match cell {
-                'b' => {
-                    println!("x : {}, z : {}", position.x, position.z);
-                    // Mur (cube solide)
-                    commands.spawn((
-                        Mesh3d(wall.clone()),
-                        MeshMaterial3d(wall_material.clone()),
-                        Transform::from_xyz(position.x, 0.5, -1.0*position.z),
-                    ));
-                }
-                'c' => {
-                    // Sol (chemin libre)
-                }
-                'm' => {
-                    // Obstacle ou chemin particulier
-                }
-                _ => {}
-            }
-        }
-    }
-}
-  */
+use crate::client::resources::world_resource::MazeResource;
 
   pub fn spawn_world_model(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    maze_resource: Res<MazeResource>
 ) {
-    let maze = load_maze_from_json("maze.json");
+    // let maze = load_maze_from_json(commands);
 
-    let maze_width = maze[0].len();
-    let maze_height = maze.len();
+    let maze = maze_resource.grid.clone();
+    let maze_width = maze_resource.width as f32;
+    let maze_height = maze_resource.height as f32;
 
     let tile_size = 1.0; // Taille d'une tuile (plus facile à ajuster ici)
 
@@ -79,6 +29,8 @@ use crate::client::systems::world::load_json_world::{self, load_maze_from_json};
     commands.spawn((
         Mesh3d(floor_mesh),
         MeshMaterial3d(floor_material),
+        Collider::cuboid(floor_size.x, 0.1, floor_size.y),
+        RigidBody::Fixed,
         Transform::from_xyz(
             -(maze_width as f32 * tile_size) / 2.0,
             -0.5,
@@ -109,6 +61,10 @@ use crate::client::systems::world::load_json_world::{self, load_maze_from_json};
                         Transform::from_xyz(position.x, position.y, position.z),
                         RigidBody::Fixed,  
                         Collider::cuboid(tile_size * 1., 3.0, tile_size * 1.0),
+                        CollisionGroups::new(
+                            Group::from_bits_truncate(0b0010),
+                            Group::from_bits_truncate(0b0001),
+                        ),
                     ));
                 }
                 'c' => {

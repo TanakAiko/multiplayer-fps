@@ -1,25 +1,17 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, transform};
+
+use crate::client::components::player_component::{AccumulatedInput, PhysicalTranslation, PreviousPhysicalTranslation, Velocity};
 
 // Une structure utilisée pour accumuler les actions du joueur, comme des 
 // pressions sur des touches, des mouvements de souris, etc. 
-#[derive(Debug, Component, Clone, Copy, PartialEq, Default, Deref, DerefMut)]
-pub struct AccumulatedInput(pub Vec2);
 
-#[derive(Debug, Component, Clone, Copy, PartialEq, Default, Deref, DerefMut)]
-pub struct Velocity(pub Vec3);
-
-#[derive(Debug, Component, Clone, Copy, PartialEq, Default, Deref, DerefMut)]
-pub struct PhysicalTranslation(pub Vec3);
-
-#[derive(Debug, Component, Clone, Copy, PartialEq, Default, Deref, DerefMut)]
-pub struct PreviousPhysicalTranslation(pub Vec3);
 
 pub fn handle_input(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     // camera_query: Query<&Transform, With<WorldModelCamera>>,
     mut query: Query<(&mut AccumulatedInput, &mut Velocity, &Transform)>,
 ) {
-    const SPEED: f32 = 8.;
+    const SPEED: f32 = 3.;
 
     for (mut input, mut velocity, player_transform) in query.iter_mut() {
         // Récupérer la direction de la caméra
@@ -59,6 +51,10 @@ pub fn handle_input(
 
         // Appliquer la vitesse
         velocity.0 = move_direction * SPEED;
+
+        // if player_transform.translation.y < 0.5 {
+        //     *velocity = Velocity(Vec3::ZERO);
+        // }
     }
 }
 

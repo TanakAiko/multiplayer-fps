@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_rapier3d::plugin::{NoUserData, RapierPhysicsPlugin};
 use multiplayer_fps::client::{
     plugins::{player_plugin::PlayerPlugin, world_plugin::WorldPlugin}, resources::network_resource::{handle_network_messages, input_connexion, NetworkResource}, udp::Client
 };
@@ -21,8 +22,9 @@ fn main() {
     App::new()
         .add_plugins((
             DefaultPlugins,
-            PlayerPlugin,
             WorldPlugin,
+            PlayerPlugin,
+            // RapierPhysicsPlugin::<NoUserData>::default(),
         ))
         // .add_plugins(PlayerPlugin)
         // .insert_resource(NetworkResource {

@@ -17,8 +17,8 @@ pub fn spawn_view_model_camera(parent: &mut ChildBuilder) {
             ..default()
         }),
         RenderLayers::layer(VIEW_MODEL_RENDER_LAYER),
-        Collider::ball(0.5),
-        RigidBody::Dynamic,
+        // Collider::ball(0.5),
+        // RigidBody::Dynamic,
     ));
     
 }

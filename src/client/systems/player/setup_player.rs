@@ -2,13 +2,15 @@ use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
 use crate::client::{
-    components::{camera_component::CameraSensitivity, player_component::Player},
+    components::{camera_component::CameraSensitivity, player_component::{AccumulatedInput, PhysicalTranslation, Player, PreviousPhysicalTranslation, Velocity}},
     systems::camera::{
         view_model_camera::spawn_view_model_camera, world_model_camera::spawn_main_camera,
     },
 };
 
-use super::{move_player::{AccumulatedInput, PhysicalTranslation, PreviousPhysicalTranslation, Velocity}, view_model_player::spawn_view_model};
+use super::view_model_player::spawn_view_model;
+
+
 
 // Le player instancie les camera comme enfant
 
@@ -30,8 +32,9 @@ fn spawn_player(commands: &mut Commands) -> Entity {
             Transform::from_xyz(0., 5., 0.),
             GlobalTransform::default(),
             Visibility::default(),
-            Collider::ball(0.5),
-            RigidBody::Dynamic,
+            // Collider::ball(0.1),
+            // Collider::cuboid(0.5, 1., 0.5),
+            // RigidBody::Dynamic,
         ))
         .id()
 }
