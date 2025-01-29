@@ -32,9 +32,9 @@ fn spawn_player(commands: &mut Commands) -> Entity {
             Transform::from_xyz(0., 5., 0.),
             GlobalTransform::default(),
             Visibility::default(),
-            // Collider::ball(0.1),
+            Collider::ball(0.5),
             // Collider::cuboid(0.5, 1., 0.5),
-            // RigidBody::Dynamic,
+            RigidBody::Dynamic,
         ))
         .id()
 }

@@ -31,6 +31,7 @@ use crate::client::resources::world_resource::MazeResource;
         MeshMaterial3d(floor_material),
         Collider::cuboid(floor_size.x, 0.1, floor_size.y),
         RigidBody::Fixed,
+        // ActiveEvents::COLLISION_EVENTS,
         Transform::from_xyz(
             -(maze_width as f32 * tile_size) / 2.0,
             -0.5,
@@ -59,12 +60,9 @@ use crate::client::resources::world_resource::MazeResource;
                         Mesh3d(wall_mesh.clone()),
                         MeshMaterial3d(wall_material.clone()),
                         Transform::from_xyz(position.x, position.y, position.z),
-                        RigidBody::Fixed,  
+                        RigidBody::Fixed,
+                        ActiveEvents::COLLISION_EVENTS,
                         Collider::cuboid(tile_size * 1., 3.0, tile_size * 1.0),
-                        CollisionGroups::new(
-                            Group::from_bits_truncate(0b0010),
-                            Group::from_bits_truncate(0b0001),
-                        ),
                     ));
                 }
                 'c' => {

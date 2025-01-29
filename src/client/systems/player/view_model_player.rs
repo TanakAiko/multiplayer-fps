@@ -21,10 +21,7 @@ pub fn spawn_view_model(
         Transform::from_xyz(0.2, -0.1, -0.25),
         Collider::cuboid(0.01, 0.01, 0.3),
         RigidBody::Fixed,
-        CollisionGroups::new(
-            Group::from_bits_truncate(0b0001),
-            Group::from_bits_truncate(0b0010),
-        ),
+        ActiveEvents::COLLISION_EVENTS,
         NotShadowCaster,
     ));
 }
