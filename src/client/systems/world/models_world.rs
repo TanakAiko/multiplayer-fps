@@ -31,7 +31,7 @@ use crate::client::resources::world_resource::MazeResource;
         MeshMaterial3d(floor_material),
         Collider::cuboid(floor_size.x, 0.1, floor_size.y),
         RigidBody::Fixed,
-        // ActiveEvents::COLLISION_EVENTS,
+        ActiveEvents::COLLISION_EVENTS,
         Transform::from_xyz(
             -(maze_width as f32 * tile_size) / 2.0,
             -0.5,

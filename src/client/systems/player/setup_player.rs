@@ -1,16 +1,21 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
+const INITIAL_POSITION_PLAYER: Vec3 = Vec3::new(20., 0.6, 20.);
+
 use crate::client::{
-    components::{camera_component::CameraSensitivity, player_component::{AccumulatedInput, PhysicalTranslation, Player, PreviousPhysicalTranslation, Velocity}},
+    components::{
+        camera_component::CameraSensitivity,
+        player_component::{
+            AccumulatedInput, PhysicalTranslation, Player, PreviousPhysicalTranslation, Velocity,
+        },
+    },
     systems::camera::{
         view_model_camera::spawn_view_model_camera, world_model_camera::spawn_main_camera,
     },
 };
 
 use super::view_model_player::spawn_view_model;
-
-
 
 // Le player instancie les camera comme enfant
 
@@ -27,14 +32,23 @@ fn spawn_player(commands: &mut Commands) -> Entity {
             CameraSensitivity::default(),
             AccumulatedInput(Vec2::ZERO),
             Velocity(Vec3::ZERO),
-            PhysicalTranslation(Vec3::ZERO),
-            PreviousPhysicalTranslation(Vec3::ZERO),
-            Transform::from_xyz(0., 5., 0.),
+            PhysicalTranslation(INITIAL_POSITION_PLAYER),
+            PreviousPhysicalTranslation(INITIAL_POSITION_PLAYER),
+            Transform::from_xyz(
+                INITIAL_POSITION_PLAYER.x,
+                INITIAL_POSITION_PLAYER.y,
+                INITIAL_POSITION_PLAYER.z,
+            ),
             GlobalTransform::default(),
             Visibility::default(),
-            Collider::ball(0.5),
-            // Collider::cuboid(0.5, 1., 0.5),
+            Collider::ball(0.1),
+            // // Collider::cuboid(0.5, 1., 0.5),
+            ActiveEvents::COLLISION_EVENTS,
             RigidBody::Dynamic,
+            GravityScale(0.),
+            // ExternalForce::default(),
+            // ExternalImpulse::default(),
+            // LockedAxes::TRANSLATION_LOCKED
         ))
         .id()
 }

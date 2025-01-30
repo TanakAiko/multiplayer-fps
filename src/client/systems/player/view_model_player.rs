@@ -19,9 +19,9 @@ pub fn spawn_view_model(
         Mesh3d(arm),
         MeshMaterial3d(arm_material),
         Transform::from_xyz(0.2, -0.1, -0.25),
-        Collider::cuboid(0.01, 0.01, 0.3),
-        RigidBody::Fixed,
-        ActiveEvents::COLLISION_EVENTS,
+        // Collider::cuboid(0.01, 0.01, 0.3),
+        // RigidBody::Fixed,
+        // ActiveEvents::COLLISION_EVENTS,
         NotShadowCaster,
     ));
 }
