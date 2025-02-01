@@ -17,6 +17,28 @@ use crate::client::{
 
 use super::view_model_player::spawn_view_model;
 
+#[derive(Bundle)]
+struct PlayerBundle {
+    player: Player,
+    camera_sensitivity: CameraSensitivity,
+    accumulated_input: AccumulatedInput,
+    velocity: Velocity,
+    physical_translation: PhysicalTranslation,
+    previous_physical_translation: PreviousPhysicalTranslation,
+    transform: Transform,
+    global_transform: GlobalTransform,
+    visibility: Visibility,
+    collider: Collider,
+    rigid_body: RigidBody,
+    gravity_scale: GravityScale,
+    locked_axes: LockedAxes,
+    collision_types: ActiveCollisionTypes,
+    active_events: ActiveEvents,
+    damping: Damping,
+    friction: Friction,
+    restitution: Restitution,
+}
+
 // Le player instancie les camera comme enfant
 
 /*
@@ -27,29 +49,39 @@ use super::view_model_player::spawn_view_model;
 // setup_player
 fn spawn_player(commands: &mut Commands) -> Entity {
     commands
-        .spawn((
-            Player,
-            CameraSensitivity::default(),
-            AccumulatedInput(Vec2::ZERO),
-            Velocity(Vec3::ZERO),
-            PhysicalTranslation(INITIAL_POSITION_PLAYER),
-            PreviousPhysicalTranslation(INITIAL_POSITION_PLAYER),
-            Transform::from_xyz(
+        .spawn(PlayerBundle {
+            player: Player,
+            camera_sensitivity: CameraSensitivity::default(),
+            accumulated_input: AccumulatedInput(Vec2::ZERO),
+            velocity: Velocity(Vec3::ZERO),
+            physical_translation: PhysicalTranslation(INITIAL_POSITION_PLAYER),
+            previous_physical_translation: PreviousPhysicalTranslation(INITIAL_POSITION_PLAYER),
+            transform: Transform::from_xyz(
                 INITIAL_POSITION_PLAYER.x,
                 INITIAL_POSITION_PLAYER.y,
                 INITIAL_POSITION_PLAYER.z,
             ),
-            GlobalTransform::default(),
-            Visibility::default(),
-            Collider::ball(0.1),
-            // // Collider::cuboid(0.5, 1., 0.5),
-            ActiveEvents::COLLISION_EVENTS,
-            RigidBody::Dynamic,
-            GravityScale(0.),
-            // ExternalForce::default(),
-            // ExternalImpulse::default(),
-            // LockedAxes::TRANSLATION_LOCKED
-        ))
+            global_transform: GlobalTransform::default(),
+            visibility: Visibility::default(),
+            collider: Collider::ball(0.1),
+            rigid_body: RigidBody::Dynamic,
+            gravity_scale: GravityScale(0.0),
+            locked_axes: LockedAxes::ROTATION_LOCKED,
+            collision_types: ActiveCollisionTypes::DYNAMIC_STATIC,
+            active_events: ActiveEvents::COLLISION_EVENTS,
+            damping: Damping {
+                linear_damping: 1.0,
+                angular_damping: 1.0,
+            },
+            friction: Friction {
+                coefficient: 0.0,
+                combine_rule: CoefficientCombineRule::Min,
+            },
+            restitution: Restitution {
+                coefficient: 0.0,
+                combine_rule: CoefficientCombineRule::Min,
+            },
+        })
         .id()
 }
 
