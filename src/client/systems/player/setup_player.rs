@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
-const INITIAL_POSITION_PLAYER: Vec3 = Vec3::new(-12., 0.6, 13.);
+const INITIAL_POSITION_PLAYER: Vec3 = Vec3::new(-12., 1.2, 13.);
 
 use crate::client::{
     components::{
@@ -86,15 +86,14 @@ fn spawn_player(commands: &mut Commands) -> Entity {
 }
 
 pub fn setup(
+    asset_server: Res<AssetServer>,
     mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let player = spawn_player(&mut commands);
 
     commands.entity(player).with_children(|parent| {
         spawn_main_camera(parent);
         spawn_view_model_camera(parent);
-        spawn_view_model(parent, &mut meshes, &mut materials);
+        spawn_view_model(parent, asset_server);
     });
 }

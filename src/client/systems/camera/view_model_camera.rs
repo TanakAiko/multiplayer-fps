@@ -13,7 +13,7 @@ pub fn spawn_view_model_camera(parent: &mut ChildBuilder) {
             ..default()
         },
         Projection::from(PerspectiveProjection {
-            fov: 70.0_f32.to_radians(),
+            fov: 90.0_f32.to_radians(),
             ..default()
         }),
         RenderLayers::layer(VIEW_MODEL_RENDER_LAYER),

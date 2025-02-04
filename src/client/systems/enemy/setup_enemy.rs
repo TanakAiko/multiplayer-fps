@@ -3,7 +3,7 @@ use bevy_rapier3d::prelude::*;
 
 use crate::client::components::enemy_component::Enemy;
 
-const ENEMY_INITIAL_POSITION: Vec3 = Vec3::new(-12., -0.1, 7.);
+const ENEMY_INITIAL_POSITION: Vec3 = Vec3::new(-12., -0.5, 7.);
 const ENEMY_INITIAL_ROTATION: Quat = Quat::IDENTITY;
 
 #[derive(Bundle, Debug, Default)]
@@ -36,7 +36,6 @@ pub fn spawn_enemy(
 
     let parent = commands.spawn((
         EnemyBundle {
-            
             // transform: Transform::from_translation(ENEMY_INITIAL_POSITION),
             transform: Transform { 
                 translation: ENEMY_INITIAL_POSITION,
