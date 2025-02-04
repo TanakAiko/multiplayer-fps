@@ -4,9 +4,7 @@ use bevy_rapier3d::{
     render::RapierDebugRenderPlugin,
 };
 use multiplayer_fps::client::{
-    plugins::{player_plugin::PlayerPlugin, world_plugin::WorldPlugin},
-    resources::network_resource::{handle_network_messages, input_connexion, NetworkResource},
-    udp::Client,
+    components::enemy_component::Enemy, plugins::{enemy_plugin::EnemyPlugin, player_plugin::PlayerPlugin, world_plugin::WorldPlugin}, resources::network_resource::{handle_network_messages, input_connexion, NetworkResource}, udp::Client
 };
 // use std::sync::Arc;
 // use tokio::runtime::Runtime;
@@ -24,7 +22,7 @@ fn main() {
 
     // Une fois connecté, démarrer Bevy
     App::new()
-        .add_plugins((DefaultPlugins, WorldPlugin, PlayerPlugin))
+        .add_plugins((DefaultPlugins, WorldPlugin, PlayerPlugin, EnemyPlugin))
         // .add_plugins(PlayerPlugin)
         // .insert_resource(NetworkResource {
         //     socket: Arc::new(socket),

@@ -128,6 +128,6 @@ pub fn interpolate_rendered_transform(
         let rendered_translation = previous.lerp(current, alpha);
 
         // Mettre à jour la transformation visuelle avec la position interpolée
-        transform.translation = rendered_translation;
+        transform.translation = rendered_translation; // C est la qu'on bouge le player
     }
 }
