@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
-const INITIAL_POSITION_PLAYER: Vec3 = Vec3::new(20., 0.6, 20.);
+const INITIAL_POSITION_PLAYER: Vec3 = Vec3::new(-12., 0.6, 13.);
 
 use crate::client::{
     components::{
