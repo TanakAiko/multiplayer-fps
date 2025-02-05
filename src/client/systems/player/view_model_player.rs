@@ -18,8 +18,6 @@ pub fn spawn_view_model(parent: &mut ChildBuilder, asset_server: Res<AssetServer
         Collider::cuboid(0.2, 0.2, 0.2),
         RigidBody::Dynamic,
         GravityScale(0.),
-        // LockedAxes::ROTATION_LOCKED,
-        // LockedAxes::TRANSLATION_LOCKED,
         LockedAxes::ROTATION_LOCKED | LockedAxes::TRANSLATION_LOCKED, // Bloque tous les axes
         NotShadowCaster::default(),
     ));

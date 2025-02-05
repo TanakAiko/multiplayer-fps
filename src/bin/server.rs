@@ -1,6 +1,7 @@
 use std::{collections::HashMap, io, net::SocketAddr, sync::Arc};
 // use multiplayer_fps::common::network::protocol::Message;
-use multiplayer_fps::common::network::protocol::Message;
+
+use multiplayer_fps::common::types::protocol::Message;
 use tokio::{net::UdpSocket, sync::RwLock};
 pub struct Server {
     clients: Arc<RwLock<HashMap<SocketAddr, String>>>,

@@ -5,7 +5,8 @@ use thiserror::Error;
 use tokio::net::UdpSocket;
 use tokio::time::timeout;
 
-use crate::common::network::protocol::Message;
+use crate::common::types::protocol::Message;
+
 
 #[derive(Error, Debug)]
 pub enum ClientError {

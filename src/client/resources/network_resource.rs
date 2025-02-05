@@ -1,11 +1,28 @@
-use std::{io::Write, net::SocketAddr,sync::Arc};
+use std::{collections::VecDeque, io::Write, net::SocketAddr, sync::Arc, time::Instant};
 use tokio::net::UdpSocket;
 use bevy::prelude::*;
-use crate::common::network::protocol::Message;
+
+use crate::common::types::{game_state::GameMessage, protocol::Message};
 
 #[derive(Resource)]
 pub struct NetworkResource {
     pub socket: Arc<UdpSocket>,
+    pub send_queue: VecDeque<GameMessage>,
+    pub last_sent: Instant
+}
+
+impl NetworkResource {
+    pub fn new(socket: UdpSocket) -> Self {
+        NetworkResource {
+            socket: Arc::new(socket),
+            send_queue: VecDeque::new(),
+            last_sent: Instant::now()
+        }
+    }
+
+    pub fn send(&mut self, message: GameMessage) {
+        self.send_queue.push_back(message);
+    }
 }
 
 
