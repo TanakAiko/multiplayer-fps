@@ -7,7 +7,7 @@ use crate::client::resources::world_resource::MazeResource;
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    maze_resource: Res<MazeResource>
+    maze_resource: Res<MazeResource>,
 ) {
     // let maze = load_maze_from_json(commands);
 
