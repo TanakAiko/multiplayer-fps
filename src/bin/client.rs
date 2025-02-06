@@ -1,14 +1,11 @@
 use bevy::prelude::*;
-use bevy_rapier3d::{
-    plugin::{NoUserData, RapierPhysicsPlugin},
-    render::RapierDebugRenderPlugin,
-};
 use multiplayer_fps::client::{
-    components::enemy_component::Enemy, plugins::{enemy_plugin::EnemyPlugin, player_plugin::PlayerPlugin, world_plugin::WorldPlugin}, resources::network_resource::{handle_network_messages, input_connexion, NetworkResource}, udp::Client
+    plugins::{enemy_plugin::EnemyPlugin, player_plugin::PlayerPlugin, world_plugin::WorldPlugin},
+    resources::network_resource::{input_connexion, NetworkResource},
+    systems::enemy::receiving_update_enemy::handle_network_messages,
+    udp::Client,
 };
 use tokio::runtime::Runtime;
-// use std::sync::Arc;
-// use tokio::runtime::Runtime;
 
 fn main() {
     // Créer le runtime une seule fois
@@ -19,7 +16,13 @@ fn main() {
     // Établir la connexion et obtenir le socket
     let socket = runtime.block_on(async {
         let client = Client::new(name);
-        client.connect(server_address).await.unwrap()
+        match client.connect(server_address).await {
+            Ok(ok) => ok,
+            Err(e) => {
+                println!("error: {:?}", e);
+                panic!()
+            }
+        }
     });
 
     // Une fois connecté, démarrer Bevy
@@ -27,6 +30,6 @@ fn main() {
         .add_plugins((DefaultPlugins, WorldPlugin, PlayerPlugin, EnemyPlugin))
         // .add_plugins(PlayerPlugin)
         .insert_resource(NetworkResource::new(socket))
-        // .add_systems(Update, handle_network_messages)
+        .add_systems(Update, handle_network_messages)
         .run();
 }

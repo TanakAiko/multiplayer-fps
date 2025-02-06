@@ -2,13 +2,12 @@ use std::time::Instant;
 
 use bevy::prelude::*;
 
-use crate::{client::{components::player_component::{Player, Velocity}, resources::network_resource::NetworkResource}, common::types::game_state::GameMessage};
+use crate::{client::{components::player_component::{Player, Velocity}, resources::network_resource::NetworkResource}, common::types::protocol::Message};
 
 
 pub fn send_player_updates(
     mut network : ResMut<NetworkResource>,
-    query: Query<(&Transform, &Velocity, &Player)>,
-    time: Res<Time>,
+    query: Query<(&Transform, &Player), With<Velocity>>,
 ) {
     const UPDATE_FREQUENCY: f32 = 1.0 / 20.0; // 20 Hz ;
 
@@ -16,12 +15,10 @@ pub fn send_player_updates(
         return;
     }
 
-    if let Ok((transform, velocity, _)) = query.get_single() {
-        let update = GameMessage::PlayerUpdate { 
+    if let Ok((transform, _)) = query.get_single() {
+        let update = Message::PlayerUpdateSending { 
             position: transform.translation, 
             rotation: transform.rotation, 
-            velocity: velocity.0, 
-            timestamp: time.elapsed_secs_f64() as u64
         };
 
         let encoded =bincode::serialize(&update).unwrap();

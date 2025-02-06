@@ -7,7 +7,6 @@ use tokio::time::timeout;
 
 use crate::common::types::protocol::Message;
 
-
 #[derive(Error, Debug)]
 pub enum ClientError {
     #[error("Erreur d'entrée/sortie: {0}")]
@@ -39,19 +38,19 @@ impl Client {
         // Créer le socket local
         let sock = UdpSocket::bind("0.0.0.0:0").await?;
         sock.connect(remote_addr).await?;
-    
+
         // Envoyer un message de test et attendre la réponse pour vérifier que le serveur est actif
         let test_message = Message::Join {
             name: self.name.clone(),
         };
         let encoded = bincode::serialize(&test_message)?;
-    
+
         // Envoyer le message avec timeout
         match timeout(Duration::from_secs(5), sock.send(&encoded)).await {
             Ok(result) => result?,
             Err(_) => return Err(ClientError::ServerNotResponding),
         };
-    
+
         // Attendre une réponse du serveur
         let mut buffer = [0u8; 1024];
         match timeout(Duration::from_secs(5), sock.recv(&mut buffer)).await {
@@ -60,11 +59,11 @@ impl Client {
                     Ok(_) => Ok(sock), // Si on reçoit une réponse, le serveur est actif
                     Err(_) => Err(ClientError::ServerNotResponding),
                 }
-            },
+            }
             Err(_) => Err(ClientError::ServerNotResponding),
         }
     }
-    
+
     // pub fn start_client() {
     //     print!("Entrez votre nom : ");
     //     match io::stdout().flush() {
@@ -112,5 +111,4 @@ impl Client {
     //         }
     //     });
     // }
-
 }

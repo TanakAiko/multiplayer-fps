@@ -1,8 +1,6 @@
 use bevy::math::{Quat, Vec3};
 use serde::{Deserialize, Serialize};
 
-
-
 #[derive(Serialize, Deserialize, Debug)]
 pub enum GameMessage {
     PlayerUpdate {

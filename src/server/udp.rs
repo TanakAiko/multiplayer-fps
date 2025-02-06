@@ -1,6 +1,6 @@
+use crate::{common::types::protocol::Message, server::utils::exeption::ServerError};
 use std::{collections::HashMap, io, net::SocketAddr, sync::Arc};
 use tokio::{net::UdpSocket, sync::RwLock};
-use crate::{common::types::protocol::Message, server::utils::exeption::ServerError};
 pub struct Server {
     clients: Arc<RwLock<HashMap<SocketAddr, String>>>,
 }
@@ -19,7 +19,7 @@ impl Server {
                 addr: ip_addr,
                 source: e,
             })?;
-            
+
         println!("Serveur écoute sur {}", ip_addr);
         let mut buf = vec![0; 1024];
 
@@ -31,8 +31,7 @@ impl Server {
                     eprintln!("Erreur lors du traitement du message: {}", e);
                     // Selon la gravité de l'erreur, on peut décider de continuer ou d'arrêter
                     match e {
-                        ServerError::InvalidMessage(_) |
-                        ServerError::InvalidClient(_) => continue, // Erreurs non-fatales
+                        ServerError::InvalidMessage(_) | ServerError::InvalidClient(_) => continue, // Erreurs non-fatales
                         _ => return Err(e), // Erreurs fatales
                     }
                 }
@@ -43,10 +42,10 @@ impl Server {
     async fn handle_client_message(
         &self,
         sock: &UdpSocket,
-        buf: &mut Vec<u8>
+        buf: &mut Vec<u8>,
     ) -> Result<(), ServerError> {
         let (len, addr) = sock.recv_from(buf).await?;
-        
+
         let message = bincode::deserialize::<Message>(&buf[..len])
             .map_err(|_| ServerError::InvalidMessage(addr))?;
 
@@ -54,15 +53,26 @@ impl Server {
             Message::Join { name } => {
                 self.handle_join(sock, addr, name).await?;
             }
-            Message::Chat { content } => todo!(),
             Message::Leave => todo!(),
+            Message::PlayerUpdateSending { position, rotation } => {
+                let name = self.clients.read().await.get(&addr).cloned().unwrap();
+                let update = Message::PlayerUpdateReceiving {
+                    name,
+                    position,
+                    rotation,
+                };
+
+                let encoded_message = bincode::serialize(&update).unwrap();
+
+                self.broadcast(sock, encoded_message).await?;
+            }
+            _ => todo!(),
         }
 
         Ok(())
     }
 
     // async fn han
-
 
     pub async fn handle_join(
         &self,
@@ -71,23 +81,32 @@ impl Server {
         name: String,
     ) -> Result<(), ServerError> {
         println!("Nouveau client connecté: {} depuis {}", name, addr);
-        
+
         // Vérification du nom
         if name.trim().is_empty() {
             return Err(ServerError::InvalidClient("Nom vide non autorisé".into()));
         }
 
         self.clients.write().await.insert(addr, name.clone());
+        let update = Message::Join { name };
 
-        // Informer tous les clients
+        let encoded_message = bincode::serialize(&update).unwrap();
+        self.broadcast(sock, encoded_message).await?;
+
+
+
+        Ok(())
+    }
+
+    pub async fn broadcast(
+        &self,
+        sock: &UdpSocket,
+        encoded_message: Vec<u8>,
+    ) -> Result<(), ServerError> {
         let connected_clients = self.clients.read().await;
-        let client_list: Vec<String> = connected_clients.values().cloned().collect();
-        
-        let response = format!("Clients connectés: {:?}", client_list);
-        let encoded = bincode::serialize(&Message::Chat { content: response })?;
 
         for client_addr in connected_clients.keys() {
-            if let Err(e) = sock.send_to(&encoded, client_addr).await {
+            if let Err(e) = sock.send_to(&encoded_message, client_addr).await {
                 eprintln!("Erreur d'envoi à {}: {}", client_addr, e);
                 // On continue malgré l'erreur pour les autres clients
                 continue;
@@ -97,17 +116,19 @@ impl Server {
         Ok(())
     }
 
-pub fn start_server() -> Result<(), ServerError> {
-    let server_address: SocketAddr = "0.0.0.0:8080".parse()
-        .map_err(|e| ServerError::ConnectionError {
-            addr: "0.0.0.0:8080".parse().unwrap(),
-            source: io::Error::new(io::ErrorKind::InvalidInput, e),
-        })?;
+    pub fn start_server() -> Result<(), ServerError> {
+        let server_address: SocketAddr =
+            "0.0.0.0:8080"
+                .parse()
+                .map_err(|e| ServerError::ConnectionError {
+                    addr: "0.0.0.0:8080".parse().unwrap(),
+                    source: io::Error::new(io::ErrorKind::InvalidInput, e),
+                })?;
 
-    println!("Serveur démarré | Adresse : {}", server_address);
+        println!("Serveur démarré | Adresse : {}", server_address);
 
-    let serv = Self::new();
-    let runtime = tokio::runtime::Runtime::new()?;
-    runtime.block_on(serv.run(server_address))
-}
+        let serv = Self::new();
+        let runtime = tokio::runtime::Runtime::new()?;
+        runtime.block_on(serv.run(server_address))
+    }
 }

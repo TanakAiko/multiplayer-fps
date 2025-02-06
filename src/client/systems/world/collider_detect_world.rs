@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_rapier3d::prelude::{CollisionEvent, ContactForceEvent};
+use bevy_rapier3d::prelude::CollisionEvent;
 use crate::client::components::player_component::Velocity;
 
 pub fn collider_detect_world(

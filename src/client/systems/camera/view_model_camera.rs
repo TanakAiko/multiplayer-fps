@@ -1,5 +1,4 @@
 use bevy::{prelude::*, render::view::RenderLayers};
-use bevy_rapier3d::prelude::*;
 
 use super::setup_camera::VIEW_MODEL_RENDER_LAYER;
 

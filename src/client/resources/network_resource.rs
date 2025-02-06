@@ -2,7 +2,7 @@ use std::{collections::VecDeque, io::Write, net::SocketAddr, sync::Arc, time::In
 use tokio::net::UdpSocket;
 use bevy::prelude::*;
 
-use crate::common::types::{game_state::GameMessage, protocol::Message};
+use crate::common::types::game_state::GameMessage;
 
 #[derive(Resource)]
 pub struct NetworkResource {
@@ -44,25 +44,3 @@ pub fn input_connexion() -> (String,SocketAddr) {
     (name, server_address)
 }
 
-
-pub fn handle_network_messages(network: Res<NetworkResource>) {
-    let mut buf = vec![0; 1024];
-    match network.socket.try_recv(&mut buf) {
-        Ok(len) => {
-            if let Ok(message) = bincode::deserialize(&buf[..len]) {
-                match message {
-                    Message::Chat { content } => {
-                        info!("Chat: {}", content);
-                    },
-                    Message::Join { name } => {
-                        info!("{} a rejoint le serveur", name);
-                    },
-                    Message::Leave => {
-                        info!("Un joueur a quitté le serveur");
-                    }
-                }
-            }
-        },
-        Err(_) => {} // Ignore errors
-    }
-}

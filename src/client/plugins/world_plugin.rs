@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_rapier3d::{
-    plugin::{NoUserData, RapierConfiguration, RapierPhysicsPlugin},
+    plugin::{NoUserData, RapierPhysicsPlugin},
     render::RapierDebugRenderPlugin,
 };
 

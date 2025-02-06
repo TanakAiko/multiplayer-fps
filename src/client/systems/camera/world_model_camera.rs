@@ -1,6 +1,4 @@
 use bevy::prelude::*;
-use bevy_rapier3d::prelude::*;
-
 use crate::client::components::camera_component::WorldModelCamera;
 
 // Ici on instancie la camera liee au monde 
