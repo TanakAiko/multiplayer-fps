@@ -11,7 +11,7 @@ pub fn handle_network_messages(
     network: Res<NetworkResource>,
     asset_server: Res<AssetServer>,
     commands: Commands,
-    mut query: Query< (&Enemy, &mut Transform)>,
+    mut query: Query<(&Enemy, &mut Transform)>,
 ) {
     let mut buf = vec![0; 1024];
     match network.socket.try_recv(&mut buf) {
@@ -19,6 +19,7 @@ pub fn handle_network_messages(
             if let Ok(message) = bincode::deserialize(&buf[..len]) {
                 match message {
                     Message::Join { name } => {
+                        info!("Un joueur a rejoint le serveur");
                         spawn_enemy(name, commands, asset_server);
                     }
                     Message::Leave => {
@@ -32,11 +33,11 @@ pub fn handle_network_messages(
                         println!("------------------------------------------------");
                         // move_enemy(name, position, rotation, query)
 
-                        for ( enemy, mut transform)in query.iter_mut() {
+                        for (enemy, mut transform) in query.iter_mut() {
                             println!("{} ======== {}", enemy.name, name);
                             
                             if enemy.name == name {
-                                
+                                // Réinitialiser les forces physiques
                                 println!("**********************************************");
                                 println!("position {}", position);
                                 println!("rotation {}", rotation);
@@ -45,6 +46,7 @@ pub fn handle_network_messages(
                                 println!("transform.translation {}", transform.translation);
                                 println!("transform.rotation {}", transform.rotation);
                                 println!("**********************************************");
+
                             }
                         }
                     }
