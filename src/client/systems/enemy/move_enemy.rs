@@ -11,7 +11,11 @@ pub fn move_enemy(
     for ( enemy, mut transform)in query.iter_mut() {
         println!("**********************************************");
         println!("{} ======== {}", enemy.name, name);
+        println!("position {}", position);
+        println!("rotation {}", rotation);
+        println!("**********************************************");
         if enemy.name == name {
+            
             transform.translation = position;
             transform.rotation = rotation;
         }

@@ -5,13 +5,13 @@ use crate::{
     common::types::protocol::Message,
 };
 
-use super::{move_enemy::move_enemy, setup_enemy::spawn_enemy};
+use super::setup_enemy::spawn_enemy;
 
 pub fn handle_network_messages(
     network: Res<NetworkResource>,
     asset_server: Res<AssetServer>,
     commands: Commands,
-    query: Query< (&Enemy, &mut Transform)>,
+    mut query: Query< (&Enemy, &mut Transform)>,
 ) {
     let mut buf = vec![0; 1024];
     match network.socket.try_recv(&mut buf) {
@@ -30,7 +30,23 @@ pub fn handle_network_messages(
                         rotation,
                     } => {
                         println!("------------------------------------------------");
-                        move_enemy(name, position, rotation, query)
+                        // move_enemy(name, position, rotation, query)
+
+                        for ( enemy, mut transform)in query.iter_mut() {
+                            println!("{} ======== {}", enemy.name, name);
+                            
+                            if enemy.name == name {
+                                
+                                println!("**********************************************");
+                                println!("position {}", position);
+                                println!("rotation {}", rotation);
+                                transform.translation = position;
+                                transform.rotation = rotation;
+                                println!("transform.translation {}", transform.translation);
+                                println!("transform.rotation {}", transform.rotation);
+                                println!("**********************************************");
+                            }
+                        }
                     }
                     _ => todo!(),
                 }

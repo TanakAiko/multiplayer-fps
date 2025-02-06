@@ -34,7 +34,7 @@ pub fn input_connexion() -> (String,SocketAddr) {
     std::io::stdin().read_line(&mut name).unwrap();
     let name = name.trim().to_string();
     
-    print!("Entrez l'adresse du serveur (ex: 0.0.0.0:8080) : ");
+    print!("Entrez l'adresse du serveur (ex: 11.11.90.18:8080) : ");
     std::io::stdout().flush().unwrap();
     let mut address = String::new();
     std::io::stdin().read_line(&mut address).unwrap();
