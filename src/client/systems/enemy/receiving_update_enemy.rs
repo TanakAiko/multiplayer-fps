@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    client::{components::enemy_component::Enemy, resources::network_resource::NetworkResource},
+    client::{components::enemy_component::Enemy, resources::network_resource::NetworkResource, systems::enemy::move_enemy::move_enemy},
     common::types::protocol::Message,
 };
 
@@ -11,7 +11,7 @@ pub fn handle_network_messages(
     network: Res<NetworkResource>,
     asset_server: Res<AssetServer>,
     commands: Commands,
-    mut query: Query<(&Enemy, &mut Transform)>,
+    query: Query<(&Enemy, &mut Transform)>,
 ) {
     let mut buf = vec![0; 1024];
     match network.socket.try_recv(&mut buf) {
@@ -30,25 +30,7 @@ pub fn handle_network_messages(
                         position,
                         rotation,
                     } => {
-                        println!("------------------------------------------------");
-                        // move_enemy(name, position, rotation, query)
-
-                        for (enemy, mut transform) in query.iter_mut() {
-                            println!("{} ======== {}", enemy.name, name);
-                            
-                            if enemy.name == name {
-                                // Réinitialiser les forces physiques
-                                println!("**********************************************");
-                                println!("position {}", position);
-                                println!("rotation {}", rotation);
-                                transform.translation = position;
-                                transform.rotation = rotation;
-                                println!("transform.translation {}", transform.translation);
-                                println!("transform.rotation {}", transform.rotation);
-                                println!("**********************************************");
-
-                            }
-                        }
+                        move_enemy(name, position, rotation, query);
                     }
                     _ => todo!(),
                 }

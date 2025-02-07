@@ -3,7 +3,7 @@ use bevy_rapier3d::prelude::*;
 
 use crate::client::components::enemy_component::Enemy;
 
-const ENEMY_INITIAL_POSITION: Vec3 = Vec3::new(-12., 1.2, 13.); // C'est en faite la meme position que le player
+const ENEMY_INITIAL_POSITION: Vec3 = Vec3::new(-12., -1., 13.); // C'est en faite la meme position que le player
 const ENEMY_INITIAL_ROTATION: Quat = Quat::IDENTITY;
 
 #[derive(Bundle, Debug, Default)]
@@ -33,7 +33,7 @@ pub fn spawn_enemy(name: String, mut commands: Commands, asset_server: Res<Asset
                     scale: Vec3::ONE,
                 },
                 global_transform: GlobalTransform::default(),
-                rigid_body: RigidBody::KinematicPositionBased,
+                rigid_body: RigidBody::Fixed,
                 collider: Collider::capsule_y(1.8, 0.3),
             },
             SceneRoot(scene_handle),

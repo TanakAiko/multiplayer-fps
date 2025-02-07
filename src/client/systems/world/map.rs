@@ -1,4 +1,4 @@
-use bevy::{color::palettes::tailwind, prelude::*};
+use bevy::{color::palettes::tailwind, prelude::*, render::view::RenderLayers};
 use crate::client::resources::world_resource::MazeResource;
 
 
@@ -21,9 +21,10 @@ pub fn spawn_map(
     commands.spawn((
         Camera2d::default(),
         Camera {
-            order: 1,
+            order: 2,
             ..Default::default()
         },
+        RenderLayers::layer(2),
     ));
 
 
