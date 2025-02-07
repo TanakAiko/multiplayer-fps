@@ -8,14 +8,22 @@ pub struct Server {
     is_game_started: bool,
     nbr_of_player: u8,
     clients: Arc<RwLock<HashMap<SocketAddr, (String, Vec3)>>>,
+    next_position_index: usize,
 }
 
 impl Server {
+    const POSITIONS: [Vec3; 3] = [
+        Vec3::new(-12.0, 1.2, 13.0),
+        Vec3::new(-9.0, 1.2, 13.0),
+        Vec3::new(-6.0, 1.2, 13.0),
+    ];
+
     fn new(nbr_player: u8) -> Self {
         Server {
             is_game_started: false,
             nbr_of_player: nbr_player,
             clients: Arc::new(RwLock::new(HashMap::new())),
+            next_position_index: 0,
         }
     }
 
@@ -96,18 +104,17 @@ impl Server {
             return Err(ServerError::InvalidClient("Nom vide non autorisé".into()));
         }
 
-        let mut positions: Vec<Vec3> = vec![
-            Vec3::new(-12., 1.2, 13.),
-            Vec3::new(-12., 1.2, 13.),
-            Vec3::new(-12., 1.2, 13.),
-        ];
-
         println!("Nouveau client connecté: {} depuis {}", name, addr);
+        if self.next_position_index >= Self::POSITIONS.len() {
+            return Err(ServerError::InvalidClient("Server is full".into()));
+        }
+        let position = Self::POSITIONS[self.next_position_index];
+        self.next_position_index += 1;
 
         self.clients
             .write()
             .await
-            .insert(addr, (name.clone(), positions.pop().unwrap()));
+            .insert(addr, (name.clone(), position));
 
         let update: Message = Message::Join { name };
         let encoded_message = bincode::serialize(&update).unwrap();

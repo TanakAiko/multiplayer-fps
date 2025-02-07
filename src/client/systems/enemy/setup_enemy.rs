@@ -9,40 +9,79 @@ const ENEMY_INITIAL_ROTATION: Quat = Quat::IDENTITY;
 #[derive(Bundle, Debug, Default)]
 pub struct EnemyBundle {
     pub enemy: Enemy,
-    pub transform: Transform,
-    pub global_transform: GlobalTransform,
-    pub rigid_body: RigidBody,
-    pub collider: Collider,
+    transform: Transform,
+    global_transform: GlobalTransform,
+    visibility: Visibility,
+    collider: Collider,
+    rigid_body: RigidBody,
+    gravity_scale: GravityScale,
+    locked_axes: LockedAxes,
+    collision_types: ActiveCollisionTypes,
+    active_events: ActiveEvents,
+    damping: Damping,
+    friction: Friction,
+    restitution: Restitution,
 }
 
-pub fn spawn_enemy(name: String, mut commands: Commands, asset_server: &Res<AssetServer>, position: Vec3) {
+pub fn spawn_enemy(
+    name: String,
+    mut commands: Commands,
+    asset_server: &Res<AssetServer>,
+    position: Vec3,
+) {
     let scene_handle: Handle<Scene> = asset_server.load("fps_enemy.gltf#Scene0");
 
-    commands
-        .spawn((
-            EnemyBundle {
-                enemy: Enemy {
-                    name,
-                    position: position,
-                    orientation: ENEMY_INITIAL_ROTATION,
-                },
-                // transform: Transform::from_translation(ENEMY_INITIAL_POSITION),
-                transform: Transform {
-                    translation: position,
-                    rotation: ENEMY_INITIAL_ROTATION,
-                    scale: Vec3::ONE,
-                },
-                global_transform: GlobalTransform::default(),
-                rigid_body: RigidBody::Fixed,
-                collider: Collider::capsule_y(1.8, 0.3),
+    commands.spawn((
+        EnemyBundle {
+            enemy: Enemy {
+                name,
+                position,
+                orientation: ENEMY_INITIAL_ROTATION,
             },
-            SceneRoot(scene_handle),
-            AnimationPlayer::default(),
-        ));
+            // transform: Transform::from_translation(ENEMY_INITIAL_POSITION),
+            transform: Transform {
+                translation: position,
+                rotation: ENEMY_INITIAL_ROTATION,
+                scale: Vec3::ONE,
+            },
+            visibility: Visibility::default(),
+            gravity_scale: GravityScale(0.0),
+            locked_axes: LockedAxes::ROTATION_LOCKED,
+            collision_types: ActiveCollisionTypes::DYNAMIC_STATIC,
+            active_events: ActiveEvents::COLLISION_EVENTS,
+            global_transform: GlobalTransform::default(),
+            rigid_body: RigidBody::Dynamic,
+            collider: Collider::capsule_y(1.8, 0.3),
+            damping: Damping {
+                linear_damping: 1.0,
+                angular_damping: 1.0,
+            },
+            friction: Friction {
+                coefficient: 0.0,
+                combine_rule: CoefficientCombineRule::Min,
+            },
+            restitution: Restitution {
+                coefficient: 0.0,
+                combine_rule: CoefficientCombineRule::Min,
+            },
+        },
+        SceneRoot(scene_handle),
+        AnimationPlayer::default(),
+    ));
 }
 
-pub fn spawn_all_enemies(mut commands: Commands, asset_server: Res<AssetServer>, enemies: Res<EnemyResource>) {
+pub fn spawn_all_enemies(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    enemies: Res<EnemyResource>,
+) {
     for enemy in enemies.enemies.iter() {
-        spawn_enemy(enemy.name.clone(), commands.reborrow(), &asset_server, enemy.position);
+        println!("enemy {:?}", enemy);
+        spawn_enemy(
+            enemy.name.clone(),
+            commands.reborrow(),
+            &asset_server,
+            enemy.position,
+        );
     }
 }

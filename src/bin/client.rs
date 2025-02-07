@@ -40,7 +40,6 @@ fn main() {
     let mut is_game_started = false;
     println!("Wait for the number of player to be completed !");
     while !is_game_started {
-        is_game_started = true;
         let mut buf = vec![0; 1024];
         match socket.try_recv(&mut buf) {
             Ok(len) => {
@@ -49,16 +48,15 @@ fn main() {
                         Message::StartGame { player, enemies } => {
                             playr = player;
                             enemis = enemies;
-
+                            is_game_started = true;
                         }
-                        _ => todo!(),
+                        _ => {}
                     }
-                } else {
-                    panic!()
                 }
             }
             Err(_) => {
-                panic!()
+                // println!("{e}");
+                // panic!()
             }
         };
     }
