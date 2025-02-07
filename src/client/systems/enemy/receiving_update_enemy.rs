@@ -1,16 +1,15 @@
 use bevy::prelude::*;
 
 use crate::{
-    client::{components::enemy_component::Enemy, resources::network_resource::NetworkResource, systems::enemy::move_enemy::move_enemy},
+    client::{
+        components::enemy_component::Enemy, resources::network_resource::NetworkResource,
+        systems::enemy::move_enemy::move_enemy,
+    },
     common::types::protocol::Message,
 };
 
-use super::setup_enemy::spawn_enemy;
-
 pub fn handle_network_messages(
     network: Res<NetworkResource>,
-    asset_server: Res<AssetServer>,
-    commands: Commands,
     query: Query<(&Enemy, &mut Transform)>,
 ) {
     let mut buf = vec![0; 1024];
@@ -18,10 +17,6 @@ pub fn handle_network_messages(
         Ok(len) => {
             if let Ok(message) = bincode::deserialize(&buf[..len]) {
                 match message {
-                    Message::Join { name } => {
-                        info!("Un joueur a rejoint le serveur");
-                        spawn_enemy(name, commands, asset_server);
-                    }
                     Message::Leave => {
                         info!("Un joueur a quitté le serveur");
                     }

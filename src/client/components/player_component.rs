@@ -1,7 +1,10 @@
 use bevy::prelude::*;
 
 #[derive(Debug, Component)]
-pub struct Player;
+pub struct Player {
+    pub name: String,
+    pub position: Vec3,
+}
 
 #[derive(Debug, Component, Clone, Copy, PartialEq, Default, Deref, DerefMut)]
 pub struct AccumulatedInput(pub Vec2);
