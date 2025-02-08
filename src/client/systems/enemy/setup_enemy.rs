@@ -35,9 +35,12 @@ pub fn spawn_enemy(
                 position,
                 orientation: ENEMY_INITIAL_ROTATION,
             },
-            // transform: Transform::from_translation(ENEMY_INITIAL_POSITION),
             transform: Transform {
-                translation: position,
+                translation: Vec3::new(
+                    position.x,
+                    position.y - 0.4,
+                    position.z,
+                ),
                 rotation: ENEMY_INITIAL_ROTATION,
                 scale: Vec3::ONE,
             },
@@ -48,7 +51,7 @@ pub fn spawn_enemy(
             active_events: ActiveEvents::COLLISION_EVENTS,
             global_transform: GlobalTransform::default(),
             rigid_body: RigidBody::Fixed,
-            collider: Collider::capsule_y(1.8, 0.3),
+            collider: Collider::ball(0.1),
         },
         SceneRoot(scene_handle),
         AnimationPlayer::default(),

@@ -60,7 +60,8 @@ fn main() {
             }
         };
     }
-
+    println!("enemis {:?}",enemis);
+    println!("playr {:?}",playr);
     // Une fois connecté, démarrer Bevy
     App::new()
         .add_plugins((DefaultPlugins, WorldPlugin, PlayerPlugin, EnemyPlugin))

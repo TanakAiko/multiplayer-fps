@@ -13,9 +13,9 @@ pub struct Server {
 
 impl Server {
     const POSITIONS: [Vec3; 3] = [
-        Vec3::new(-12.0, 1.2, 13.0),
-        Vec3::new(-9.0, 1.2, 13.0),
-        Vec3::new(-6.0, 1.2, 13.0),
+        Vec3::new(-18., 2.5, -13.),
+        Vec3::new(-18., 2.5, -9.),
+        Vec3::new(-18., 2.5, -3.),
     ];
 
     fn new(nbr_player: u8) -> Self {
@@ -163,34 +163,6 @@ impl Server {
 
         Ok(())
     }
-
-    // pub async fn send_all_enemies(&self, target_name: String) {
-    //     // Get read access to the clients HashMap
-    //     let clients = self.clients.read().await;
-
-    //     // Collect all client names except the target
-    //     let all_names: Vec<String> = clients
-    //         .values()
-    //         .filter(|name| **name != target_name)
-    //         .cloned()
-    //         .collect();
-
-    //     // Find the socket address of the target client
-    //     if let Some((&target_addr, _)) = clients.iter().find(|(_, name)| **name == target_name) {
-    //         // Serialize the names vector
-    //         let encoded_message = bincode::serialize(&all_names).unwrap();
-
-    //         if let Err(e) = sock.send_to(&encoded_message, client_addr).await {
-    //             eprintln!("Erreur d'envoi à {}: {}", client_addr, e);
-    //             // On continue malgré l'erreur pour les autres clients
-    //             continue;
-    //         }
-    //         // Here you would send the encoded_message to target_addr
-    //         // The actual sending code depends on your network implementation
-    //         // For example:
-    //         // self.socket.send_to(&encoded_message, target_addr).unwrap();
-    //     }
-    // }
 
     pub async fn broadcast(
         &self,

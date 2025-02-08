@@ -32,7 +32,6 @@ pub fn move_player(
         let move_direction = (player_forward_horizontal * direction.z
             + player_right_horizontal * direction.x)
             .normalize_or_zero() * SPEED;
-
         transform.translation += move_direction;
     }
 }
