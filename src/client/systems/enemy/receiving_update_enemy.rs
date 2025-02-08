@@ -10,7 +10,7 @@ use crate::{
 
 pub fn handle_network_messages(
     network: Res<NetworkResource>,
-    commands: Commands,
+    _commands: Commands,
     asset_server: Res<AssetServer>,
     query: Query< (&Enemy, &mut Transform, &mut AnimationPlayer)>,
 ) {

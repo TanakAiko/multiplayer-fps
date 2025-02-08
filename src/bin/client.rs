@@ -9,7 +9,7 @@ use multiplayer_fps::{
             network_resource::{input_connexion, NetworkResource},
             player_resource::PlayerResource,
         },
-        systems::enemy::receiving_update_enemy::handle_network_messages,
+        systems::{enemy::receiving_update_enemy::handle_network_messages, window_config_system::config_window},
         udp::Client,
     },
     common::types::protocol::{CommonPlayer, Message},
@@ -68,6 +68,6 @@ fn main() {
         .insert_resource(NetworkResource::new(socket))
         .insert_resource(EnemyResource::new(enemis))
         .insert_resource(PlayerResource::new(playr))
-        .add_systems(Update, handle_network_messages)
+        .add_systems(Update, (handle_network_messages, config_window))
         .run();
 }

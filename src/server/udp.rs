@@ -198,13 +198,20 @@ impl Server {
     }
 
     pub fn start_server() -> Result<(), ServerError> {
-        print!("Entrez le nombre de player : ");
+        print!("Entrez le nombre de player : (default 2) ");
         std::io::stdout().flush().unwrap();
 
-        // Use String to read input
         let mut player_count = String::new();
+        
+        
+        // Use String to read input
         std::io::stdin().read_line(&mut player_count)?;
-
+        
+        // Stop server if player count is more than 10
+        if player_count.trim().parse::<usize>().unwrap_or(2) > 10 {
+            return Err(ServerError::InvalidClient("Nombre de joueurs invalide".into()));
+        }
+        
         // Parse the input to an integer
         let player_count: usize = player_count.trim().parse().unwrap_or(2);
 
