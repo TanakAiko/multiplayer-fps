@@ -10,7 +10,9 @@ use crate::{
 
 pub fn handle_network_messages(
     network: Res<NetworkResource>,
-    query: Query<(&Enemy, &mut Transform)>,
+    commands: Commands,
+    asset_server: Res<AssetServer>,
+    query: Query< (&Enemy, &mut Transform, &mut AnimationPlayer)>,
 ) {
     let mut buf = vec![0; 1024];
     match network.socket.try_recv(&mut buf) {
@@ -25,7 +27,7 @@ pub fn handle_network_messages(
                         position,
                         rotation,
                     } => {
-                        move_enemy(name, position, rotation, query);
+                        move_enemy(name, position, rotation, asset_server, query);
                     }
                     _ => todo!(),
                 }

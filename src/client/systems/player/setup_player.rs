@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
 // const INITIAL_POSITION_PLAYER: Vec3 = Vec3::new(-12., 1.2, 13.);
+// const INITIAL_ROTATION_PLAYER: Quat = Quat::IDENTITY;
 
 use crate::client::{
     components::{
