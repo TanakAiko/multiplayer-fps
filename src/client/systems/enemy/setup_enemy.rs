@@ -18,9 +18,6 @@ pub struct EnemyBundle {
     locked_axes: LockedAxes,
     collision_types: ActiveCollisionTypes,
     active_events: ActiveEvents,
-    damping: Damping,
-    friction: Friction,
-    restitution: Restitution,
 }
 
 pub fn spawn_enemy(
@@ -50,20 +47,8 @@ pub fn spawn_enemy(
             collision_types: ActiveCollisionTypes::DYNAMIC_STATIC,
             active_events: ActiveEvents::COLLISION_EVENTS,
             global_transform: GlobalTransform::default(),
-            rigid_body: RigidBody::Dynamic,
+            rigid_body: RigidBody::Fixed,
             collider: Collider::capsule_y(1.8, 0.3),
-            damping: Damping {
-                linear_damping: 1.0,
-                angular_damping: 1.0,
-            },
-            friction: Friction {
-                coefficient: 0.0,
-                combine_rule: CoefficientCombineRule::Min,
-            },
-            restitution: Restitution {
-                coefficient: 0.0,
-                combine_rule: CoefficientCombineRule::Min,
-            },
         },
         SceneRoot(scene_handle),
         AnimationPlayer::default(),

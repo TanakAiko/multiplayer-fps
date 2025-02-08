@@ -10,9 +10,8 @@ pub enum ServerError {
     #[error("Erreur de sérialisation: {0}")]
     Serialization(#[from] bincode::Error),
     
-    #[error("Erreur de connexion à l'adresse {addr}: {source}")]
+    #[error("Erreur de connexion à l'adresse  {source}")]
     ConnectionError {
-        addr: SocketAddr,
         source: io::Error,
     },
     

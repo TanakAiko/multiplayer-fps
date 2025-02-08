@@ -15,7 +15,7 @@ use crate::client::resources::world_resource::MazeResource;
     let maze_width = maze_resource.width as f32;
     let maze_height = maze_resource.height as f32;
 
-    let tile_size = 1.0; // Taille d'une tuile (plus facile à ajuster ici)
+    let tile_size = 1.; // Taille d'une tuile (plus facile à ajuster ici)
 
     // Dimensions du sol basées sur la taille du labyrinthe
     let floor_size = Vec2::new(
@@ -48,9 +48,9 @@ use crate::client::resources::world_resource::MazeResource;
         for (x, &cell) in row.iter().enumerate() {
             // Calculer la position de la tuile (centrée autour de l'origine)
             let position = Vec3::new(
-                x as f32 * tile_size - (maze_width as f32 * tile_size) / 2.0,
+                x as f32 * tile_size - (maze_width as f32 * tile_size) / 1.0,
                 1.0,
-                z as f32 * tile_size - (maze_height as f32 * tile_size) / 2.0,
+                z as f32 * tile_size - (maze_height as f32 * tile_size) / 1.0,
             );
 
             match cell {
@@ -62,7 +62,7 @@ use crate::client::resources::world_resource::MazeResource;
                         Transform::from_xyz(position.x, position.y, position.z),
                         RigidBody::Fixed,
                         ActiveEvents::COLLISION_EVENTS,
-                        Collider::cuboid(tile_size * 1., 3.0, tile_size * 1.0),
+                        Collider::cuboid(tile_size * 1., 3.0, tile_size * 1.),
                     ));
                 }
                 'c' => {

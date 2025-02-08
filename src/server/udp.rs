@@ -27,15 +27,28 @@ impl Server {
         }
     }
 
-    async fn run(&mut self, ip_addr: SocketAddr) -> Result<(), ServerError> {
-        let sock = UdpSocket::bind(ip_addr)
+    async fn run(&mut self) -> Result<(), ServerError> {
+        let default_sock = UdpSocket::bind("0.0.0.0:0")
             .await
-            .map_err(|e| ServerError::ConnectionError {
-                addr: ip_addr,
-                source: e,
-            })?;
+            .map_err(|e| ServerError::ConnectionError { source: e })?;
 
-        println!("Serveur écoute sur {}", ip_addr);
+        default_sock.connect("8.8.8.8:80").await.ok();
+
+        let ip = if let Ok(local_addr) = default_sock.local_addr() {
+            let ip = local_addr.ip();
+            ip
+        } else {
+            return Err(ServerError::ConnectionError {
+                source: io::Error::new(io::ErrorKind::Other, "Could not get local address"),
+            });
+        };
+
+        let sock = UdpSocket::bind(SocketAddr::new(ip, 8080))
+            .await
+            .map_err(|e| ServerError::ConnectionError { source: e })?;
+
+        println!("Serveur écoute sur {:?}", sock.local_addr().unwrap());
+
         let mut buf = vec![0; 1024];
 
         loop {
@@ -202,30 +215,23 @@ impl Server {
         std::io::stdout().flush().unwrap();
 
         let mut player_count = String::new();
-        
-        
+
         // Use String to read input
         std::io::stdin().read_line(&mut player_count)?;
-        
+
         // Stop server if player count is more than 10
         if player_count.trim().parse::<usize>().unwrap_or(2) > 10 {
-            return Err(ServerError::InvalidClient("Nombre de joueurs invalide".into()));
+            return Err(ServerError::InvalidClient(
+                "Nombre de joueurs invalide".into(),
+            ));
         }
-        
+
         // Parse the input to an integer
         let player_count: usize = player_count.trim().parse().unwrap_or(2);
-
-        let server_address: SocketAddr =
-            "0.0.0.0:8080"
-                .parse()
-                .map_err(|e| ServerError::ConnectionError {
-                    addr: "0.0.0.0:8080".parse().unwrap(),
-                    source: io::Error::new(io::ErrorKind::InvalidInput, e),
-                })?;
 
         // println!("We need at least 2 players to start the game !");
         let mut serv = Self::new(player_count as u8);
         let runtime = tokio::runtime::Runtime::new()?;
-        runtime.block_on(serv.run(server_address))
+        runtime.block_on(serv.run())
     }
 }
