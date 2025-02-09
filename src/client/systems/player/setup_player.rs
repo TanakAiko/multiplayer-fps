@@ -5,14 +5,11 @@ use bevy_rapier3d::prelude::*;
 // const INITIAL_ROTATION_PLAYER: Quat = Quat::IDENTITY;
 
 use crate::client::{
-    components::{
-        camera_component::CameraSensitivity,
-        player_component::{
-            AccumulatedInput, PhysicalTranslation, Player, PreviousPhysicalTranslation, Velocity,
-        },
-    }, resources::player_resource::PlayerResource, systems::camera::{
+    components::{camera_component::CameraSensitivity, player_component::Player},
+    resources::player_resource::PlayerResource,
+    systems::camera::{
         view_model_camera::spawn_view_model_camera, world_model_camera::spawn_main_camera,
-    }
+    },
 };
 
 use super::view_model_player::spawn_view_model;
@@ -21,10 +18,6 @@ use super::view_model_player::spawn_view_model;
 struct PlayerBundle {
     player: Player,
     camera_sensitivity: CameraSensitivity,
-    accumulated_input: AccumulatedInput,
-    velocity: Velocity,
-    physical_translation: PhysicalTranslation,
-    previous_physical_translation: PreviousPhysicalTranslation,
     transform: Transform,
     global_transform: GlobalTransform,
     visibility: Visibility,
@@ -50,15 +43,11 @@ struct PlayerBundle {
 fn spawn_player(commands: &mut Commands, res_player: Res<PlayerResource>) -> Entity {
     commands
         .spawn(PlayerBundle {
-            player: Player{
+            player: Player {
                 name: res_player.name.clone(),
-                position: res_player.position
+                position: res_player.position,
             },
             camera_sensitivity: CameraSensitivity::default(),
-            accumulated_input: AccumulatedInput(Vec2::ZERO),
-            velocity: Velocity(Vec3::ZERO),
-            physical_translation: PhysicalTranslation(res_player.position),
-            previous_physical_translation: PreviousPhysicalTranslation(res_player.position),
             transform: Transform::from_xyz(
                 res_player.position.x,
                 res_player.position.y,
@@ -66,7 +55,7 @@ fn spawn_player(commands: &mut Commands, res_player: Res<PlayerResource>) -> Ent
             ),
             global_transform: GlobalTransform::default(),
             visibility: Visibility::default(),
-            collider: Collider::ball(0.1),
+            collider: Collider::ball(0.5),
             rigid_body: RigidBody::Dynamic,
             gravity_scale: GravityScale(0.0),
             locked_axes: LockedAxes::ROTATION_LOCKED,

@@ -13,9 +13,9 @@ pub struct Server {
 
 impl Server {
     const POSITIONS: [Vec3; 3] = [
-        Vec3::new(-18., 2.5, -13.),
-        Vec3::new(-18., 2.5, -9.),
-        Vec3::new(-18., 2.5, -3.),
+        Vec3::new(-18., 0., -13.),
+        Vec3::new(-18., 0., -9.),
+        Vec3::new(-18., 0., -3.),
     ];
 
     fn new(nbr_player: u8) -> Self {
@@ -94,6 +94,9 @@ impl Server {
 
                 self.broadcast(sock, encoded_message).await?;
             }
+            Message::GameOver => {
+                self.handle_game_over(sock, addr).await?;
+            }
             _ => todo!(),
         }
 
@@ -101,6 +104,32 @@ impl Server {
     }
 
     // async fn han
+
+    pub async fn handle_game_over(
+        &mut self,
+        sock: &UdpSocket,
+        winner_addr: SocketAddr,
+    ) -> Result<(), ServerError> {
+        // Notify the winner
+        let encoded_win_message = bincode::serialize(&Message::Win).unwrap();
+        let encoded_lose_message = bincode::serialize(&Message::Lose).unwrap();
+
+        sock.send_to(&encoded_win_message, winner_addr).await?;
+
+        let connected_clients = self.clients.read().await;
+        for client_addr in connected_clients.keys() {
+            if &winner_addr == client_addr {
+                continue;
+            }
+
+            if let Err(e) = sock.send_to(&encoded_lose_message, client_addr).await {
+                eprintln!("Erreur d'envoi à {}: {}", client_addr, e);
+                continue;
+            }
+        }
+
+        Ok(())
+    }
 
     pub async fn handle_join(
         &mut self,
@@ -141,7 +170,7 @@ impl Server {
             for (player_addr, (player_name, player_pos)) in clients.iter() {
                 let player = CommonPlayer {
                     name: player_name.clone(),
-                    position: *player_pos,
+                    position: Vec3::new(player_pos.x, player_pos.y + 1.5, player_pos.z), // 🔹 Augmente Y de 2
                 };
 
                 let mut enemies = Vec::new();

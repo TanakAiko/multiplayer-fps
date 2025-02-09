@@ -20,7 +20,7 @@ struct FlagBundle {
 }
 
 pub fn spawn_flag(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let scene_handle: Handle<Scene> = asset_server.load("fps_flag.gltf#Scene0");
+    let scene_handle: Handle<Scene> = asset_server.load("flag_in_the_wind.gltf#Scene0");
 
     commands.spawn((
         FlagBundle {
@@ -35,7 +35,7 @@ pub fn spawn_flag(mut commands: Commands, asset_server: Res<AssetServer>) {
             collision_types: ActiveCollisionTypes::DYNAMIC_STATIC,
             active_events: ActiveEvents::COLLISION_EVENTS,
             rigid_body: RigidBody::Fixed,
-            collider: Collider::capsule_y(1.8, 0.2),
+            collider: Collider::capsule_y(1.8, 0.3),
         },
         SceneRoot(scene_handle),
         AnimationPlayer::default(),

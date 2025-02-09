@@ -9,7 +9,10 @@ use multiplayer_fps::{
             network_resource::{input_connexion, NetworkResource},
             player_resource::PlayerResource,
         },
-        systems::{enemy::receiving_update_enemy::handle_network_messages, window_config_system::config_window},
+        systems::{
+            enemy::receiving_update_enemy::handle_network_messages,
+            window_config_system::config_window,
+        },
         udp::Client,
     },
     common::types::protocol::{CommonPlayer, Message},
@@ -54,18 +57,14 @@ fn main() {
                     }
                 }
             }
-            Err(_) => {
-                // println!("{e}");
-                // panic!()
-            }
+            Err(_) => {}
         };
     }
-    println!("enemis {:?}",enemis);
-    println!("playr {:?}",playr);
-    // Une fois connecté, démarrer Bevy
+    println!("enemis {:?}", enemis);
+    println!("playr {:?}", playr);
+    // Once connected, start Bevy
     App::new()
         .add_plugins((DefaultPlugins, WorldPlugin, PlayerPlugin, EnemyPlugin))
-        // .add_plugins(PlayerPlugin)
         .insert_resource(NetworkResource::new(socket))
         .insert_resource(EnemyResource::new(enemis))
         .insert_resource(PlayerResource::new(playr))

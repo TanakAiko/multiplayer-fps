@@ -1,6 +1,6 @@
+use crate::client::resources::world_resource::MazeResource;
 use bevy::{color::palettes::tailwind, prelude::*};
 use bevy_rapier3d::prelude::*;
-use crate::client::resources::world_resource::MazeResource;
 
 pub fn spawn_world_model(
     mut commands: Commands,
@@ -12,8 +12,8 @@ pub fn spawn_world_model(
     let maze_width = maze_resource.width as f32;
     let maze_height = maze_resource.height as f32;
 
-    let tile_size = 1.; // Taille d'une tuile
-    let spacing = 2.;   // Espace entre les murs
+    let tile_size = 0.4; // Taille d'une tuile
+    let spacing = 4.; // Espace entre les murs
 
     let floor_size = Vec2::new(
         maze_width * tile_size * spacing,
@@ -25,25 +25,24 @@ pub fn spawn_world_model(
     commands.spawn((
         Mesh3d(floor_mesh),
         MeshMaterial3d(floor_material),
-        Collider::cuboid(floor_size.x, 0.1, floor_size.y),
+        Collider::cuboid(floor_size.x, 0.08, floor_size.y),
         RigidBody::Fixed,
-        ActiveEvents::COLLISION_EVENTS,
+        // ActiveEvents::COLLISION_EVENTS,
         Transform::from_xyz(
             -(maze_width * tile_size * spacing) / 2.0,
-            0., 
+            -0.1,
             -(maze_height * tile_size * spacing) / 2.0,
-        )
-        
+        ),
     ));
 
-    let wall_mesh = meshes.add(Cuboid::new(tile_size * spacing, 3.0, tile_size * spacing)); // Ajuste la taille du mur
+    let wall_mesh = meshes.add(Cuboid::new(tile_size * spacing, 5.0, tile_size * spacing)); // Ajuste la taille du mur
     let wall_material = materials.add(Color::from(tailwind::ORANGE_400));
 
     for (z, row) in maze.iter().enumerate() {
         for (x, &cell) in row.iter().enumerate() {
             let position = Vec3::new(
                 x as f32 * tile_size * spacing - (maze_width * tile_size * spacing) / 2.0,
-                1.,
+                0.,
                 z as f32 * tile_size * spacing - (maze_height * tile_size * spacing) / 2.0,
             );
             match cell {
@@ -54,13 +53,15 @@ pub fn spawn_world_model(
                         Transform::from_xyz(position.x, position.y, position.z),
                         RigidBody::Fixed,
                         ActiveEvents::COLLISION_EVENTS,
-                        Collider::cuboid(tile_size * spacing, 3.0, tile_size * spacing),
+                        Collider::cuboid(
+                            (tile_size * spacing) / 2.,
+                            5.0,
+                            (tile_size * spacing) / 2.,
+                        ),
                     ));
                 }
-                'c' => {
-                }
-                _ => {
-                }
+                'f' => {}
+                _ => {}
             }
         }
     }

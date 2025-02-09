@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy::app::AppExit;
 
 use crate::{
     client::{
@@ -13,6 +14,7 @@ pub fn handle_network_messages(
     _commands: Commands,
     asset_server: Res<AssetServer>,
     query: Query< (&Enemy, &mut Transform, &mut AnimationPlayer)>,
+    mut exit_writer: EventWriter<AppExit>,  // 🔹 Ajout pour quitter le jeu
 ) {
     let mut buf = vec![0; 1024];
     match network.socket.try_recv(&mut buf) {
@@ -28,6 +30,14 @@ pub fn handle_network_messages(
                         rotation,
                     } => {
                         move_enemy(name, position, rotation, asset_server, query);
+                    }
+                    Message::Win => {
+                        println!("Nahhh, I'd Win !!! 😎🔥");
+                        exit_writer.send(AppExit::Success);
+                    }
+                    Message::Lose => {
+                        println!("You Loserrrrr ❌");
+                        exit_writer.send(AppExit::Success);
                     }
                     _ => todo!(),
                 }

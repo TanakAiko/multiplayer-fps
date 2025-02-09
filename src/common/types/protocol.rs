@@ -34,5 +34,8 @@ pub enum Message {
         player: CommonPlayer,
         enemies: Vec<CommonPlayer>,
     },
+    GameOver,
+    Win,
+    Lose,
     Leave,
 }

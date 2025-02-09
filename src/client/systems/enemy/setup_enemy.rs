@@ -28,34 +28,42 @@ pub fn spawn_enemy(
 ) {
     let scene_handle: Handle<Scene> = asset_server.load("fps_enemy.gltf#Scene0");
 
-    commands.spawn((
-        EnemyBundle {
-            enemy: Enemy {
-                name,
-                position,
-                orientation: ENEMY_INITIAL_ROTATION,
-            },
-            transform: Transform {
-                translation: Vec3::new(
-                    position.x,
-                    position.y - 0.4,
-                    position.z,
-                ),
+    let capsule_height = 0.8; // Hauteur du corps
+    let capsule_radius = 0.3; // Rayon
+    let collider_offset = capsule_height / 2.0;
+
+    commands
+        .spawn((
+            SceneRoot(scene_handle.clone()), // 🔹 Modèle 3D
+            AnimationPlayer::default(),
+            Transform {
+                translation: position, // 🔹 Position réelle de l'avatar (sans modification de Y)
                 rotation: ENEMY_INITIAL_ROTATION,
                 scale: Vec3::ONE,
             },
-            visibility: Visibility::default(),
-            gravity_scale: GravityScale(0.0),
-            locked_axes: LockedAxes::ROTATION_LOCKED,
-            collision_types: ActiveCollisionTypes::DYNAMIC_STATIC,
-            active_events: ActiveEvents::COLLISION_EVENTS,
-            global_transform: GlobalTransform::default(),
-            rigid_body: RigidBody::Fixed,
-            collider: Collider::ball(0.1),
-        },
-        SceneRoot(scene_handle),
-        AnimationPlayer::default(),
-    ));
+            GlobalTransform::default(),
+        ))
+        .with_children(|parent| {
+            parent.spawn((EnemyBundle {
+                enemy: Enemy {
+                    name,
+                    position,
+                    orientation: ENEMY_INITIAL_ROTATION,
+                },
+                transform: Transform {
+                    translation: Vec3::new(0.0, collider_offset, 0.0), // 🔹 Seul le collider est déplacé
+                    ..Default::default()
+                },
+                visibility: Visibility::default(),
+                gravity_scale: GravityScale(0.0),
+                locked_axes: LockedAxes::ROTATION_LOCKED,
+                collision_types: ActiveCollisionTypes::DYNAMIC_STATIC,
+                active_events: ActiveEvents::COLLISION_EVENTS,
+                global_transform: GlobalTransform::default(),
+                rigid_body: RigidBody::Fixed,
+                collider: Collider::capsule_y(capsule_height, capsule_radius),
+            },));
+        });
 }
 
 pub fn spawn_all_enemies(
