@@ -90,6 +90,8 @@ impl Server {
                     rotation,
                 };
 
+                // println!("update: {:?}", update);
+
                 let encoded_message = bincode::serialize(&update).unwrap();
 
                 self.broadcast(sock, encoded_message).await?;
@@ -150,6 +152,7 @@ impl Server {
         if self.next_position_index >= Self::POSITIONS.len() {
             return Err(ServerError::InvalidClient("Server is full".into()));
         }
+
         let position = Self::POSITIONS[self.next_position_index];
         self.next_position_index += 1;
 

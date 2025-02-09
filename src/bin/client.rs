@@ -60,8 +60,9 @@ fn main() {
             Err(_) => {}
         };
     }
-    println!("enemis {:?}", enemis);
-    println!("playr {:?}", playr);
+    // println!("enemis {:?}", enemis);
+    // println!("playr {:?}", playr);
+    
     // Once connected, start Bevy
     App::new()
         .add_plugins((DefaultPlugins, WorldPlugin, PlayerPlugin, EnemyPlugin))
