@@ -13,7 +13,7 @@ pub fn spawn_world_model(
     let maze_height = maze_resource.height as f32;
 
     let tile_size = 0.4; // Taille d'une tuile
-    let spacing = 4.; // Espace entre les murs
+    let spacing = 5.; // Espace entre les murs
 
     let floor_size = Vec2::new(
         maze_width * tile_size * spacing,
@@ -55,7 +55,7 @@ pub fn spawn_world_model(
                         ActiveEvents::COLLISION_EVENTS,
                         Collider::cuboid(
                             (tile_size * spacing) / 2.,
-                            5.0,
+                            5.0 / 2.,
                             (tile_size * spacing) / 2.,
                         ),
                     ));

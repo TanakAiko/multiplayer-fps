@@ -28,8 +28,8 @@ pub fn spawn_enemy(
 ) {
     let scene_handle: Handle<Scene> = asset_server.load("fps_enemy.gltf#Scene0");
 
-    let capsule_height = 0.8; // Hauteur du corps
-    let capsule_radius = 0.3; // Rayon
+    let capsule_height = 1.01; // Hauteur du corps
+    let capsule_radius = 0.305; // Rayon
     let collider_offset = capsule_height / 2.0;
 
     commands
