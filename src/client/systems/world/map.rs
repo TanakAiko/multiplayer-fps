@@ -1,7 +1,6 @@
 use bevy::{color::palettes::tailwind, prelude::*, render::view::RenderLayers};
 use crate::client::resources::world_resource::MazeResource;
 
-
 pub fn spawn_map(
     mut commands: Commands,
     window_query: Query<&Window>,

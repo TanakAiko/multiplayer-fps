@@ -1,11 +1,17 @@
 use bevy::prelude::*;
 
+
+// #[derive(Component)]
+// pub struct Shootable;
+
 #[derive(Debug, Component)]
 pub struct Enemy {
     pub name: String,
     pub position: Vec3,
     pub orientation: Quat,
 }
+
+
 
 impl Default for Enemy {
     fn default() -> Self {

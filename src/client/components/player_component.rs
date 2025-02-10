@@ -4,6 +4,7 @@ use bevy::prelude::*;
 pub struct Player {
     pub name: String,
     pub position: Vec3,
+    // pub health: f32
 }
 
 #[derive(Debug, Component, Clone, Copy, PartialEq, Default, Deref, DerefMut)]

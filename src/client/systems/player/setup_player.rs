@@ -1,9 +1,6 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
-// const INITIAL_POSITION_PLAYER: Vec3 = Vec3::new(-12., 1.2, 13.);
-// const INITIAL_ROTATION_PLAYER: Quat = Quat::IDENTITY;
-
 use crate::client::{
     components::{camera_component::CameraSensitivity, player_component::Player},
     resources::player_resource::PlayerResource,
@@ -48,6 +45,7 @@ fn spawn_player(commands: &mut Commands, res_player: Res<PlayerResource>) -> Ent
             player: Player {
                 name: res_player.name.clone(),
                 position: res_player.position,
+                // health: 100.
             },
             camera_sensitivity: CameraSensitivity::default(),
             transform: Transform {
