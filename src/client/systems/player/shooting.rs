@@ -95,7 +95,7 @@ pub fn update_bullets(
 pub fn handle_bullet_collision(
     mut commands: Commands,
     bullets: Query<(Entity, &Bullet)>,
-    mut players: Query<Entity, With<Enemy>>,
+    players: Query<(Entity, &Parent), With<Enemy>>,
     mut collision_events: EventReader<CollisionEvent>,
 ) {
     for collision_event in collision_events.read() {
@@ -107,14 +107,14 @@ pub fn handle_bullet_collision(
             } else {
                 *entity1
             };
-            
 
             if let Ok((bullet_entity, bullet)) = bullet_result {
-                if let Ok(player_entity) = players.get_mut(other_entity) {
-                    if player_entity != bullet.shooter_id {
+                if let Ok(player_entity) = players.get(other_entity) {
+                    if player_entity.0 != bullet.shooter_id {
                         // health.current -= bullet.damage;
                         commands.entity(bullet_entity).despawn();
-                        commands.entity(player_entity).despawn();
+                        // commands.entity(player_entity).despawn();
+                        commands.entity(player_entity.1.get()).despawn_recursive();
                     }
                 }
             }
