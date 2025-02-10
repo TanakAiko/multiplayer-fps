@@ -29,7 +29,7 @@ pub fn spawn_enemy(
     mut commands: Commands,
     asset_server: &Res<AssetServer>,
     position: Vec3,
-    mut graphs : ResMut<Assets<AnimationGraph>>,
+    graphs : &mut ResMut<Assets<AnimationGraph>>,
 ) {
     
     let capsule_height = 1.01; // Hauteur du corps
@@ -64,7 +64,7 @@ pub fn spawn_enemy(
                 scale: Vec3::ONE,
             },
             GlobalTransform::default(),
-        ))
+        )).observe(play_animation_when_ready)
         .with_children(|parent| {
             parent.spawn((EnemyBundle {
                 enemy: Enemy {
@@ -120,7 +120,7 @@ pub fn spawn_all_enemies(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     enemy_resource: Res<EnemyResource>,
-    //  graph : ResMut<Assets<AnimationGraph>>
+    mut graph : ResMut<Assets<AnimationGraph>>
 ) {
     for enemy in enemy_resource.enemies.iter() {
         println!("enemy {:?}", enemy);
@@ -129,7 +129,7 @@ pub fn spawn_all_enemies(
             commands.reborrow(),
             &asset_server,
             enemy.position,
-            // graph,
+            &mut graph,
         );
     }
 }

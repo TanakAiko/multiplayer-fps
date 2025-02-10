@@ -6,7 +6,7 @@ pub fn move_enemy(
     name: String,
     mut position: Vec3,
     rotation: Quat,
-    asset_server: Res<AssetServer>,
+    _asset_server: Res<AssetServer>,
     enemy_query: Query<(Entity, &Parent, &Enemy)>, // 🔹 Récupère l'ennemi et son parent
     mut parent_query: Query<(&mut Transform, &mut AnimationPlayer)>,
 ) {
@@ -15,7 +15,7 @@ pub fn move_enemy(
     println!("position: {}, rotation:{}", position, rotation);
     for (_yenemy_entity, parent, enemy) in enemy_query.iter() {
         if enemy.name == name {
-            if let Ok((mut parent_transform, mut animation_player)) =
+            if let Ok((mut parent_transform, mut _animation_player)) =
                 parent_query.get_mut(parent.get())
             {
                 // 🔹 Accède au transform du parent
