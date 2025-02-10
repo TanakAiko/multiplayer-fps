@@ -24,17 +24,8 @@ pub fn move_enemy(
                 let distance = old_position.distance(position); // 🔹 Distance entre ancienne et nouvelle position
 
                 if distance > 0.01 {
-                    // Commence à bouger
-                    let walk_animation = AnimationGraph::from_clip(
-                        asset_server
-                            .load(GltfAssetLabel::Animation(2).from_asset("fps_enemy.gltf")),
-                    );
-                    // 🔹 Si besoin, jouer animation
-                    animation_player.play(walk_animation.1.clone());
-                    // animation_player.play(walk_animation.1.clone());
+                   
                 } else {
-                    // Animation Idle si immobile
-                    // animation_player.play("Idle".to_string());
                 }
 
                 parent_transform.translation = position;
