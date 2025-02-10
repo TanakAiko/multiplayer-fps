@@ -47,7 +47,7 @@ pub fn spawn_enemy(
     };
     
     // let scene_handle: Handle<Scene> = asset_server.load("fps_enemy.gltf#Scene0");
-    let scene_handle: SceneRoot =  SceneRoot(asset_server.load(GltfAssetLabel::Scene(0).from_asset("ps_enemy.glb")));
+    let scene_handle: SceneRoot =  SceneRoot(asset_server.load(GltfAssetLabel::Scene(0).from_asset("fps_enemy.glb")));
 
 
 
@@ -97,6 +97,8 @@ fn play_animation_when_ready(
 ) {
     if let Ok(animation_to_play) = animations_to_play.get(trigger.entity()) {
         for child in children.iter_descendants(trigger.entity()) {
+            println!("=================================play_animation_when_ready {:?}", animation_to_play);
+            
             if let Ok(mut player) = players.get_mut(child) {
                 // T start the animation and keep
                 // repeating it.

@@ -12,7 +12,6 @@ pub fn move_enemy(
 ) {
     position.y = 0.; // Ajustement de la taille de l'ennemi
 
-    println!("position: {}, rotation:{}", position, rotation);
     for (_yenemy_entity, parent, enemy) in enemy_query.iter() {
         if enemy.name == name {
             if let Ok((mut parent_transform, mut _animation_player)) =
