@@ -12,10 +12,19 @@ pub struct Server {
 }
 
 impl Server {
-    const POSITIONS: [Vec3; 3] = [
-        Vec3::new(-18., 0., -13.),
-        Vec3::new(-18., 0., -9.),
-        Vec3::new(-18., 0., -3.),
+
+    // Complete nombre possible de joueur
+    const POSITIONS: [Vec3; 10] = [
+        Vec3::new(-18.0, 0., 13.0),
+        Vec3::new(-18.0, 0., -9.0),
+        Vec3::new(-18.0, 0., 3.0),
+        Vec3::new(-18.0, 0., 0.),
+        Vec3::new(-0.0, 0., 13.0),
+        Vec3::new(3.0, 0., 13.0),
+        Vec3::new(6.0, 0., 13.0),
+        Vec3::new(9.0, 0., 13.0),
+        Vec3::new(12.0, 0., 13.0),
+        Vec3::new(15.0, 0., 13.0),
     ];
 
     fn new(nbr_player: u8) -> Self {
@@ -235,6 +244,7 @@ impl Server {
 
         // println!("We need at least 2 players to start the game !");
         let mut serv = Self::new(player_count as u8);
+
         let runtime = tokio::runtime::Runtime::new()?;
         runtime.block_on(serv.run())
     }

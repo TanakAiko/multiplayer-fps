@@ -3,8 +3,7 @@ use bevy_rapier3d::prelude::*;
 
 use crate::client::{components::enemy_component::Enemy, resources::enemy_resource::EnemyResource};
 
-// const ENEMY_INITIAL_POSITION: Vec3 = Vec3::new(-12., -1., 13.); // C'est en faite la meme position que le player
-const ENEMY_INITIAL_ROTATION: Quat = Quat::IDENTITY;
+pub const PLAYER_INITIAL_ROTATION: Quat = Quat::IDENTITY;
 
 #[derive(Bundle, Debug, Default)]
 pub struct EnemyBundle {
@@ -38,7 +37,7 @@ pub fn spawn_enemy(
             AnimationPlayer::default(),
             Transform {
                 translation: position, // 🔹 Position réelle de l'avatar (sans modification de Y)
-                rotation: ENEMY_INITIAL_ROTATION,
+                rotation: PLAYER_INITIAL_ROTATION,
                 scale: Vec3::ONE,
             },
             GlobalTransform::default(),
@@ -48,7 +47,7 @@ pub fn spawn_enemy(
                 enemy: Enemy {
                     name,
                     position,
-                    orientation: ENEMY_INITIAL_ROTATION,
+                    orientation: PLAYER_INITIAL_ROTATION,
                 },
                 transform: Transform {
                     translation: Vec3::new(0.0, collider_offset, 0.0), // 🔹 Seul le collider est déplacé
@@ -69,9 +68,9 @@ pub fn spawn_enemy(
 pub fn spawn_all_enemies(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    enemies: Res<EnemyResource>,
+    enemy_resource: Res<EnemyResource>,
 ) {
-    for enemy in enemies.enemies.iter() {
+    for enemy in enemy_resource.enemies.iter() {
         println!("enemy {:?}", enemy);
         spawn_enemy(
             enemy.name.clone(),

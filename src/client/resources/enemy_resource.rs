@@ -8,9 +8,9 @@ pub struct EnemyResource {
 }
 
 impl EnemyResource {
-    pub fn new(nemies: Vec<CommonPlayer>) -> Self {
+    pub fn new(common_players: Vec<CommonPlayer>) -> Self {
         let mut enemies = Vec::new();
-        for enemy in nemies {
+        for enemy in common_players {
             enemies.push(Enemy{
                 name: enemy.name,
                 position: enemy.position,

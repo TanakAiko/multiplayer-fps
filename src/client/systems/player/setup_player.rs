@@ -7,9 +7,9 @@ use bevy_rapier3d::prelude::*;
 use crate::client::{
     components::{camera_component::CameraSensitivity, player_component::Player},
     resources::player_resource::PlayerResource,
-    systems::camera::{
+    systems::{camera::{
         view_model_camera::spawn_view_model_camera, world_model_camera::spawn_main_camera,
-    },
+    }, enemy::setup_enemy::PLAYER_INITIAL_ROTATION}
 };
 
 use super::view_model_player::spawn_view_model;
@@ -48,11 +48,11 @@ fn spawn_player(commands: &mut Commands, res_player: Res<PlayerResource>) -> Ent
                 position: res_player.position,
             },
             camera_sensitivity: CameraSensitivity::default(),
-            transform: Transform::from_xyz(
-                res_player.position.x,
-                res_player.position.y,
-                res_player.position.z,
-            ),
+            transform: Transform {
+                translation: res_player.position,
+                rotation: PLAYER_INITIAL_ROTATION,
+                scale: Vec3::ONE,
+            },
             global_transform: GlobalTransform::default(),
             visibility: Visibility::default(),
             collider: Collider::ball(0.5),

@@ -12,7 +12,7 @@ impl Default for Enemy {
         Self {
             name: String::new(),
             position: Vec3::ZERO,
-            orientation: Quat::IDENTITY,
+            orientation: Quat::from_rotation_y(std::f32::consts::PI),
         }
     }
 }
