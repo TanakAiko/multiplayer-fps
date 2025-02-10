@@ -11,18 +11,23 @@ pub fn move_enemy(
     mut parent_query: Query<(&mut Transform, &mut AnimationPlayer)>,
 ) {
     position.y = 0.; // Ajustement de la taille de l'ennemi
+
+    println!("position: {}, rotation:{}", position, rotation);
     for (_yenemy_entity, parent, enemy) in enemy_query.iter() {
         if enemy.name == name {
-            if let Ok((mut parent_transform, mut animation_player)) = parent_query.get_mut(parent.get()) {
+            if let Ok((mut parent_transform, mut animation_player)) =
+                parent_query.get_mut(parent.get())
+            {
                 // 🔹 Accède au transform du parent
-                
+
                 let old_position = parent_transform.translation;
                 let distance = old_position.distance(position); // 🔹 Distance entre ancienne et nouvelle position
 
                 if distance > 0.01 {
                     // Commence à bouger
                     let walk_animation = AnimationGraph::from_clip(
-                        asset_server.load(GltfAssetLabel::Animation(2).from_asset("fps_enemy.gltf")),
+                        asset_server
+                            .load(GltfAssetLabel::Animation(2).from_asset("fps_enemy.gltf")),
                     );
                     // 🔹 Si besoin, jouer animation
                     animation_player.play(walk_animation.1.clone());
@@ -36,7 +41,10 @@ pub fn move_enemy(
 
                 // 🔹 Appliquer la rotation (conserver seulement Yaw)
                 let (yaw, _, _) = rotation.to_euler(EulerRot::YXZ);
-                parent_transform.rotation = Quat::from_euler(EulerRot::YXZ, yaw, 0., 0.);
+                let additional_rotation = Quat::from_rotation_y(std::f32::consts::PI); // 🔹 Rotation de 180° (PI radians)
+
+                parent_transform.rotation =
+                    additional_rotation * Quat::from_euler(EulerRot::YXZ, yaw, 0., 0.);
             }
         }
     }

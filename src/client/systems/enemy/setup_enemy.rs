@@ -1,9 +1,14 @@
+use std::f32::consts::PI;
+
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
 use crate::client::{components::enemy_component::Enemy, resources::enemy_resource::EnemyResource};
 
-pub const PLAYER_INITIAL_ROTATION: Quat = Quat::IDENTITY;
+// const ENEMY_INITIAL_POSITION: Vec3 = Vec3::new(-12., -1., 13.); // C'est en faite la meme position que le player
+lazy_static::lazy_static! {
+    static ref ENEMY_INITIAL_ROTATION: Quat = Quat::from_rotation_y(PI);
+}
 
 #[derive(Bundle, Debug, Default)]
 pub struct EnemyBundle {
@@ -37,7 +42,7 @@ pub fn spawn_enemy(
             AnimationPlayer::default(),
             Transform {
                 translation: position, // 🔹 Position réelle de l'avatar (sans modification de Y)
-                rotation: PLAYER_INITIAL_ROTATION,
+                rotation: *ENEMY_INITIAL_ROTATION,
                 scale: Vec3::ONE,
             },
             GlobalTransform::default(),
@@ -47,7 +52,7 @@ pub fn spawn_enemy(
                 enemy: Enemy {
                     name,
                     position,
-                    orientation: PLAYER_INITIAL_ROTATION,
+                    orientation: *ENEMY_INITIAL_ROTATION,
                 },
                 transform: Transform {
                     translation: Vec3::new(0.0, collider_offset, 0.0), // 🔹 Seul le collider est déplacé

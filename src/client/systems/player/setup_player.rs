@@ -7,12 +7,14 @@ use bevy_rapier3d::prelude::*;
 use crate::client::{
     components::{camera_component::CameraSensitivity, player_component::Player},
     resources::player_resource::PlayerResource,
-    systems::{camera::{
+    systems::camera::{
         view_model_camera::spawn_view_model_camera, world_model_camera::spawn_main_camera,
-    }, enemy::setup_enemy::PLAYER_INITIAL_ROTATION}
+    },
 };
 
 use super::view_model_player::spawn_view_model;
+
+const PLAYER_INITIAL_ROTATION: Quat = Quat::IDENTITY;
 
 #[derive(Bundle)]
 struct PlayerBundle {
