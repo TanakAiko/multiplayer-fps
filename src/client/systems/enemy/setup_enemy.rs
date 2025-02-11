@@ -5,6 +5,7 @@ use bevy_rapier3d::prelude::*;
 
 use crate::client::{components::{animation_component::AnimationComponent, enemy_component::Enemy}, resources::enemy_resource::EnemyResource};
 
+const GLB_ENEMY: &str = "fps_enemy.glb";
 // const ENEMY_INITIAL_POSITION: Vec3 = Vec3::new(-12., -1., 13.); // C'est en faite la meme position que le player
 lazy_static::lazy_static! {
     static ref ENEMY_INITIAL_ROTATION: Quat = Quat::from_rotation_y(PI);
@@ -36,20 +37,35 @@ pub fn spawn_enemy(
     let capsule_radius = 0.305; // Rayon
     let collider_offset = capsule_height / 2.0;
     
-    let (graph, index) = AnimationGraph::from_clip(
-        asset_server.load(GltfAssetLabel::Animation(1).from_asset("fps_enemy.glb")),
+    // let scene_handle: Handle<Scene> = asset_server.load("fps_enemy.gltf#Scene0");
+    let scene_handle: SceneRoot =  SceneRoot(asset_server.load(GltfAssetLabel::Scene(0).from_asset(GLB_ENEMY)));
+    
+    let (idle_graph, _idle_index) = AnimationGraph::from_clip(
+        asset_server.load(GltfAssetLabel::Animation(4).from_asset(GLB_ENEMY))
     );
-    let graph_handle = graphs.add(graph);
+    let (run_graph, _) = AnimationGraph::from_clip(
+        asset_server.load(GltfAssetLabel::Animation(16).from_asset(GLB_ENEMY))
+    );
+    let (shoot_graph, _) = AnimationGraph::from_clip(
+        asset_server.load(GltfAssetLabel::Animation(1).from_asset(GLB_ENEMY))
+    );
+    let (death_graph, _) = AnimationGraph::from_clip(
+        asset_server.load(GltfAssetLabel::Animation(0).from_asset(GLB_ENEMY))
+    );
+    let (gun_pointing_graph, gun_pointing_index) = AnimationGraph::from_clip(
+        asset_server.load(GltfAssetLabel::Animation(6).from_asset(GLB_ENEMY))
+    );
+
+    graphs.add(idle_graph);
+    graphs.add(run_graph);
+    graphs.add(shoot_graph);
+    graphs.add(death_graph);
+    let idle_graph_handle = graphs.add(gun_pointing_graph);
     
     let animation_to_play = AnimationComponent {
-        graph_handle,
-        index,
+        graph_handle: idle_graph_handle,
+        index: gun_pointing_index,
     };
-    
-    // let scene_handle: Handle<Scene> = asset_server.load("fps_enemy.gltf#Scene0");
-    let scene_handle: SceneRoot =  SceneRoot(asset_server.load(GltfAssetLabel::Scene(0).from_asset("fps_enemy.glb")));
-
-
 
 
     commands
@@ -71,6 +87,7 @@ pub fn spawn_enemy(
                     name,
                     position,
                     orientation: *ENEMY_INITIAL_ROTATION,
+                    current_state: Default::default(), // Idle
                 },
                 transform: Transform {
                     translation: Vec3::new(0.0, collider_offset, 0.0), // 🔹 Seul le collider est déplacé
@@ -89,15 +106,14 @@ pub fn spawn_enemy(
 }
 
 fn play_animation_when_ready(
-    trigger: Trigger<SceneInstanceReady>,
+    trigger: Trigger<SceneInstanceReady>, // Déclenché quand une scène 3D est chargée
     mut commands: Commands,
-    children: Query<&Children>,
-    animations_to_play: Query<&AnimationComponent>,
-    mut players: Query<&mut AnimationPlayer>,
+    children: Query<&Children>,  // Pour accéder aux enfants des entités
+    animations_to_play: Query<&AnimationComponent>, // Les animations à jouer
+    mut players: Query<&mut AnimationPlayer>, // Les lecteurs d'animation
 ) {
     if let Ok(animation_to_play) = animations_to_play.get(trigger.entity()) {
         for child in children.iter_descendants(trigger.entity()) {
-            println!("=================================play_animation_when_ready {:?}", animation_to_play);
             
             if let Ok(mut player) = players.get_mut(child) {
                 // T start the animation and keep

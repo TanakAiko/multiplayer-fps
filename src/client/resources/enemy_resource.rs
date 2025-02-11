@@ -23,3 +23,14 @@ impl EnemyResource {
         }
     }
 }
+
+
+#[derive(States, Default, Debug, Clone, Eq, PartialEq, Hash)]
+pub enum EnemyState {
+    #[default]
+    Idle,
+    Run,
+    Shoot,
+    Death,
+    GunPointing,
+}

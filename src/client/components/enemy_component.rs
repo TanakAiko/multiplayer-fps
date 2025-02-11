@@ -1,14 +1,13 @@
 use bevy::prelude::*;
 
-
-// #[derive(Component)]
-// pub struct Shootable;
+use crate::client::resources::enemy_resource::EnemyState;
 
 #[derive(Debug, Component)]
 pub struct Enemy {
     pub name: String,
     pub position: Vec3,
     pub orientation: Quat,
+    pub current_state: EnemyState,
 }
 
 
@@ -19,6 +18,7 @@ impl Default for Enemy {
             name: String::new(),
             position: Vec3::ZERO,
             orientation: Quat::from_rotation_y(std::f32::consts::PI),
+            current_state: EnemyState::Idle,
         }
     }
 }

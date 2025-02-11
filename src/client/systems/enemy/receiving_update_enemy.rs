@@ -12,10 +12,9 @@ use crate::{
 pub fn handle_network_messages(
     network: Res<NetworkResource>,
     _commands: Commands,
-    asset_server: Res<AssetServer>,
-    enemy_query: Query<(Entity, &Parent, &Enemy)>,
+    enemy_query: Query<( &Parent, &Enemy)>,
     mut exit_writer: EventWriter<AppExit>,
-    parent_query: Query<(&mut Transform, &mut AnimationPlayer)>,
+    parent_query: Query<&mut Transform>,
 ) {
     let mut buf = vec![0; 1024];
     match network.socket.try_recv(&mut buf) {
@@ -34,7 +33,6 @@ pub fn handle_network_messages(
                             name,
                             position,
                             rotation,
-                            asset_server,
                             enemy_query,
                             parent_query,
                         );

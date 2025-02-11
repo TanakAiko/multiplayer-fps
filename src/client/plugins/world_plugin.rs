@@ -7,7 +7,7 @@ use bevy_rapier3d::{
 use crate::client::{
     resources::world_resource::MazeResource,
     systems::{
-        light_system::spawn_light,
+        common::light_system::spawn_light,
         world::{
             collider_detect_world::collider_detect_world, 
             load_json_world::load_maze_from_json, map::spawn_map, models_world::spawn_world_model,
