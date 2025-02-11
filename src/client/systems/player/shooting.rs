@@ -1,12 +1,15 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
-use crate::client::components::{
-    bullet::{Bullet, BulletDirection},
-    camera_component::CameraSensitivity,
-    enemy_component::Enemy,
-    player_component::Player,
-};
+use crate::{client::{
+    components::{
+        bullet::{Bullet, BulletDirection},
+        camera_component::CameraSensitivity,
+        enemy_component::Enemy,
+        player_component::Player,
+    },
+    resources::network_resource::NetworkResource,
+}, common::types::protocol::Message};
 
 pub fn player_shooting(
     mut commands: Commands,
@@ -97,6 +100,7 @@ pub fn handle_bullet_collision(
     bullets: Query<(Entity, &Bullet)>,
     players: Query<(Entity, &Parent), With<Enemy>>,
     mut collision_events: EventReader<CollisionEvent>,
+    network: ResMut<NetworkResource>,
 ) {
     for collision_event in collision_events.read() {
         if let CollisionEvent::Started(entity1, entity2, _) = collision_event {
@@ -115,6 +119,10 @@ pub fn handle_bullet_collision(
                         commands.entity(bullet_entity).despawn();
                         // commands.entity(player_entity).despawn();
                         commands.entity(player_entity.1.get()).despawn_recursive();
+                        let encoded = bincode::serialize(&Message::GameOver).unwrap();
+                        if let Err(e) = network.socket.try_send(&encoded) {
+                            error!("Erreur d'envoi: {}", e);
+                        }
                     }
                 }
             }

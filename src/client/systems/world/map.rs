@@ -23,7 +23,7 @@ pub fn spawn_map(
             order: 2,
             ..Default::default()
         },
-        RenderLayers::layer(2),
+        RenderLayers::layer(0),
     ));
 
 
