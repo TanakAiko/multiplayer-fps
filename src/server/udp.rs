@@ -12,7 +12,6 @@ pub struct Server {
 }
 
 impl Server {
-
     // Complete nombre possible de joueur
     const POSITIONS: [Vec3; 10] = [
         Vec3::new(-18.0, 0., 13.0),
@@ -156,7 +155,13 @@ impl Server {
         if name.trim().is_empty() {
             return Err(ServerError::InvalidClient("Nom vide non autorisé".into()));
         }
-
+        let clients = self.clients.read().await;
+        if clients
+            .values()
+            .any(|(existing_name, _)| existing_name == &name)
+        {
+            return Err(ServerError::InvalidClient("Nom déjà utilisé".into()));
+        }
         println!("Nouveau client connecté: {} depuis {}", name, addr);
         if self.next_position_index >= Self::POSITIONS.len() {
             return Err(ServerError::InvalidClient("Server is full".into()));
