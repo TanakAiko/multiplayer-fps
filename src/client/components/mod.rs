@@ -4,3 +4,4 @@ pub mod  enemy_component;
 pub mod flag_component;
 pub mod bullet;
 pub mod animation_component;
+pub mod page_ui;

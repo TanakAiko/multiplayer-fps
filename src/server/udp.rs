@@ -104,8 +104,10 @@ impl Server {
 
                 self.broadcast(sock, encoded_message).await?;
             }
-            Message::GameOver => {
-                self.handle_game_over(sock, addr).await?;
+            Message::GameOver {
+                loser_name,
+            } => {
+                self.handle_game_over(sock, loser_name).await?;
             }
             _ => todo!(),
         }
@@ -118,26 +120,13 @@ impl Server {
     pub async fn handle_game_over(
         &mut self,
         sock: &UdpSocket,
-        winner_addr: SocketAddr,
+        loser_name: String,
     ) -> Result<(), ServerError> {
         // Notify the winner
-        let encoded_win_message = bincode::serialize(&Message::Win).unwrap();
-        let encoded_lose_message = bincode::serialize(&Message::Lose).unwrap();
+        let encoded_lose_message = bincode::serialize(&Message::GameOver { loser_name }).unwrap();
 
-        sock.send_to(&encoded_win_message, winner_addr).await?;
-
-        let connected_clients = self.clients.read().await;
-        for client_addr in connected_clients.keys() {
-            if &winner_addr == client_addr {
-                continue;
-            }
-
-            if let Err(e) = sock.send_to(&encoded_lose_message, client_addr).await {
-                eprintln!("Erreur d'envoi à {}: {}", client_addr, e);
-                continue;
-            }
-        }
-
+        self.broadcast(sock, encoded_lose_message).await?;
+       
         Ok(())
     }
 
@@ -155,6 +144,8 @@ impl Server {
         if name.trim().is_empty() {
             return Err(ServerError::InvalidClient("Nom vide non autorisé".into()));
         }
+        // Vérification de la longueur du nom
+        // Creation d'un scope pour limiter la visibilité de clients
         {
             let clients = self.clients.read().await;
             if clients
@@ -164,6 +155,7 @@ impl Server {
                 return Err(ServerError::InvalidClient("Nom déjà utilisé".into()));
             }
         }
+
         println!("Nouveau client connecté: {} depuis {}", name, addr);
         if self.next_position_index >= Self::POSITIONS.len() {
             return Err(ServerError::InvalidClient("Server is full".into()));

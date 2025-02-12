@@ -1,15 +1,19 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
-use crate::{client::{
-    components::{
-        bullet::{Bullet, BulletDirection},
-        camera_component::CameraSensitivity,
-        enemy_component::Enemy,
-        player_component::Player,
+use crate::{
+    client::{
+        components::{
+            bullet::{Bullet, BulletDirection},
+            camera_component::CameraSensitivity,
+            enemy_component::Enemy,
+            player_component::Player,
+        },
+        resources::network_resource::NetworkResource,
+        systems::common::remove_the_dead::despawn_the_dead,
     },
-    resources::network_resource::NetworkResource,
-}, common::types::protocol::Message};
+    common::types::protocol::Message,
+};
 
 pub fn player_shooting(
     mut commands: Commands,
@@ -98,7 +102,10 @@ pub fn update_bullets(
 pub fn handle_bullet_collision(
     mut commands: Commands,
     bullets: Query<(Entity, &Bullet)>,
-    players: Query<(Entity, &Parent), With<Enemy>>,
+    enemies_query: Query<(Entity, &Parent, &Enemy), With<Enemy>>,
+    enemies_query_2: Query<(&Parent, &Enemy), With<Enemy>>,
+    // player_query: Query<(&Parent, &Player), With<Player>>,
+    player_query: Single<(Entity, &Player)>,
     mut collision_events: EventReader<CollisionEvent>,
     network: ResMut<NetworkResource>,
 ) {
@@ -113,13 +120,23 @@ pub fn handle_bullet_collision(
             };
 
             if let Ok((bullet_entity, bullet)) = bullet_result {
-                if let Ok(player_entity) = players.get(other_entity) {
+                if let Ok(player_entity) = enemies_query.get(other_entity) {
                     if player_entity.0 != bullet.shooter_id {
                         // health.current -= bullet.damage;
                         commands.entity(bullet_entity).despawn();
-                        // commands.entity(player_entity).despawn();
-                        commands.entity(player_entity.1.get()).despawn_recursive();
-                        let encoded = bincode::serialize(&Message::GameOver).unwrap();
+
+                        // commands.entity(player_entity.1.get()).despawn_recursive();
+                        despawn_the_dead(
+                            commands.reborrow(),
+                            player_entity.2.name.clone(),
+                            &enemies_query_2,
+                            &player_query,
+                        );
+                        let game_over = Message::GameOver {
+                            loser_name: player_entity.2.name.clone(),
+                        };
+
+                        let encoded = bincode::serialize(&game_over).unwrap();
                         if let Err(e) = network.socket.try_send(&encoded) {
                             error!("Erreur d'envoi: {}", e);
                         }

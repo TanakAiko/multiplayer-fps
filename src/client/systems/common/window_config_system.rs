@@ -1,10 +1,15 @@
 use bevy::{prelude::*, window::PresentMode};
 
+use crate::client::components::player_component::Player;
+
 pub fn config_window(
     mut query_window: Single<&mut Window>,
+    query_player: Single<&Player>,
 ) {
+    // player name
+    let player_name = query_player.name.clone();
     let query_window_clone = query_window.clone();
-    query_window.title = "Maze Game".to_string();
+    query_window.title = "Maze Game - ".to_string() + player_name.as_str();
     query_window.cursor_options.visible = false;
     // query_window.cursor_options.grab_mode = CursorGrabMode::Locked; // Lock the cursor
     // Center cursor on window

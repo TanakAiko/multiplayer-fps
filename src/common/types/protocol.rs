@@ -34,7 +34,9 @@ pub enum Message {
         player: CommonPlayer,
         enemies: Vec<CommonPlayer>,
     },
-    GameOver,
+    GameOver {
+        loser_name: String,
+    },
     Win,
     Lose,
     Leave,
