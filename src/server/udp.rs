@@ -155,12 +155,14 @@ impl Server {
         if name.trim().is_empty() {
             return Err(ServerError::InvalidClient("Nom vide non autorisé".into()));
         }
-        let clients = self.clients.read().await;
-        if clients
-            .values()
-            .any(|(existing_name, _)| existing_name == &name)
         {
-            return Err(ServerError::InvalidClient("Nom déjà utilisé".into()));
+            let clients = self.clients.read().await;
+            if clients
+                .values()
+                .any(|(existing_name, _)| existing_name == &name)
+            {
+                return Err(ServerError::InvalidClient("Nom déjà utilisé".into()));
+            }
         }
         println!("Nouveau client connecté: {} depuis {}", name, addr);
         if self.next_position_index >= Self::POSITIONS.len() {
