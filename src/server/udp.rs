@@ -15,7 +15,7 @@ impl Server {
     // Complete nombre possible de joueur
     const POSITIONS: [Vec3; 10] = [
         Vec3::new(-18.0, 0., 13.0),
-        Vec3::new(-18.0, 0., -9.0),
+        Vec3::new(-18.0, 0., -15.0),
         Vec3::new(-18.0, 0., 3.0),
         Vec3::new(-18.0, 0., 0.),
         Vec3::new(-0.0, 0., 13.0),

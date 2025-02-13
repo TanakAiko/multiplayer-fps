@@ -9,15 +9,12 @@ pub fn spawn_map(
 
     let maze = maze_resource.grid.clone();
 
-
     let shape_size = 10.0;
     let minimap_margin = 10.0;
 
     let window = window_query.single();
     let window_width = window.width();
     let window_height = window.height();
-
-    println!("window_height: {} || window_width: {}", window_height, window_width);
 
     commands.spawn((
         Camera2d::default(),

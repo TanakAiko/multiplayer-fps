@@ -55,7 +55,7 @@ fn spawn_player(commands: &mut Commands, res_player: &Res<PlayerResource>) -> En
             },
             global_transform: GlobalTransform::default(),
             visibility: Visibility::default(),
-            collider: Collider::ball(0.5),
+            collider: Collider::cuboid(0.7, 0.1, 0.7),
             rigid_body: RigidBody::Dynamic,
             gravity_scale: GravityScale(0.0),
             locked_axes: LockedAxes::ROTATION_LOCKED,
