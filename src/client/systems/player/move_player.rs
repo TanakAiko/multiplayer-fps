@@ -1,10 +1,13 @@
 use bevy::prelude::*;
 
-use crate::client::components::player_component::Player;
+use crate::client::{
+    components::player_component::Player, resources::player_resource::PlayerResource,
+};
 
 pub fn move_player(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     mut query: Query<&mut Transform, With<Player>>,
+    mut res_player: ResMut<PlayerResource>,
 ) {
     const SPEED: f32 = 0.1;
     let mut direction = Vec3::ZERO;
@@ -31,7 +34,9 @@ pub fn move_player(
 
         let move_direction = (player_forward_horizontal * direction.z
             + player_right_horizontal * direction.x)
-            .normalize_or_zero() * SPEED;
+            .normalize_or_zero()
+            * SPEED;
         transform.translation += move_direction;
+        res_player.position = transform.translation.clone();
     }
 }

@@ -4,3 +4,4 @@ pub mod rotate_player;
 pub mod move_player;
 pub mod send_update_player;
 pub mod shooting;
+pub mod mini_map_player;

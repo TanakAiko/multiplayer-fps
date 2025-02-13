@@ -7,6 +7,9 @@ pub struct Player {
     // pub health: f32
 }
 
+#[derive(Debug, Component)]
+pub struct MiniMapPlayer;
+
 #[derive(Debug, Component, Clone, Copy, PartialEq, Default, Deref, DerefMut)]
 pub struct AccumulatedInput(pub Vec2);
 

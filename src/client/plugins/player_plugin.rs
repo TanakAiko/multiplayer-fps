@@ -1,11 +1,12 @@
 use bevy::prelude::*;
 
-use crate::client::{
-    systems::player::shooting::{handle_bullet_collision, player_shooting, update_bullets},
-    systems::player::{
-        move_player::move_player, rotate_player::rotate_player,
-        send_update_player::send_player_updates, setup_player::setup,
-    },
+use crate::client::systems::player::{
+    mini_map_player::update_minimap_player,
+    move_player::move_player,
+    rotate_player::rotate_player,
+    send_update_player::send_player_updates,
+    setup_player::setup,
+    shooting::{handle_bullet_collision, player_shooting, update_bullets},
 };
 
 pub struct PlayerPlugin;
@@ -18,10 +19,11 @@ impl Plugin for PlayerPlugin {
                 (
                     rotate_player,
                     move_player,
-                    send_player_updates,
+                    send_player_updates,    
                     player_shooting,
                     update_bullets,
                     handle_bullet_collision,
+                    update_minimap_player,  
                 ),
             );
     }

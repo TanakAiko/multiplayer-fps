@@ -9,7 +9,7 @@ use crate::client::{
     },
 };
 
-use super::view_model_player::spawn_view_model;
+use super::{mini_map_player::spawn_mini_map_player, view_model_player::spawn_view_model};
 
 const PLAYER_INITIAL_ROTATION: Quat = Quat::IDENTITY;
 
@@ -39,7 +39,7 @@ struct PlayerBundle {
       d'autres composants comme les caméras.
 */
 // setup_player
-fn spawn_player(commands: &mut Commands, res_player: Res<PlayerResource>) -> Entity {
+fn spawn_player(commands: &mut Commands, res_player: &Res<PlayerResource>) -> Entity {
     commands
         .spawn(PlayerBundle {
             player: Player {
@@ -82,11 +82,12 @@ pub fn setup(
     res_player: Res<PlayerResource>,
     mut commands: Commands,
 ) {
-    let player = spawn_player(&mut commands, res_player);
+    let player = spawn_player(&mut commands, &res_player);
 
     commands.entity(player).with_children(|parent| {
         spawn_main_camera(parent);
         spawn_view_model_camera(parent);
         spawn_view_model(parent, asset_server);
     });
+    spawn_mini_map_player(commands, &res_player);
 }
