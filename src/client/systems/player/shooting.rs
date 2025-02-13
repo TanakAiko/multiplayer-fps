@@ -7,7 +7,7 @@ use crate::{
             bullet::{Bullet, BulletDirection},
             camera_component::CameraSensitivity,
             enemy_component::Enemy,
-            player_component::Player,
+            player_component::{Player, PlayerShoot},
         },
         resources::network_resource::NetworkResource,
         systems::common::remove_the_dead::despawn_the_dead,
@@ -15,18 +15,25 @@ use crate::{
     common::types::protocol::Message,
 };
 
+use super::step::playsoundshoot;
+
 pub fn player_shooting(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     keyboard: Res<ButtonInput<KeyCode>>,
-    player_query: Query<Entity, With<Player>>,
+    time: Res<Time>,
+    mut player_query: Query<(&mut Player, Entity)>,
     camera_query: Query<(&mut Transform, &CameraSensitivity), With<Player>>,
+    music_controller: Query<&AudioSink, With<PlayerShoot>>,
 ) {
-    if let (Ok(entity), Ok(camera_transform)) =
-        (player_query.get_single(), camera_query.get_single())
+    if let (Ok((mut player, entity)), Ok(camera_transform)) =
+        (player_query.get_single_mut(), camera_query.get_single())
     {
-        if keyboard.just_pressed(KeyCode::Space) {
+        player.shoot_timer.tick(time.delta());
+
+        let mut is_shooting = false;
+        if keyboard.pressed(KeyCode::Space) {
             let spawn_position =
                 camera_transform.0.translation + camera_transform.0.forward() * 1.0;
             spawn_bullet(
@@ -37,7 +44,10 @@ pub fn player_shooting(
                 spawn_position,
                 entity,
             );
+            is_shooting = true;
+            player.shoot_timer.reset();
         }
+        playsoundshoot(&music_controller, is_shooting);
     }
 }
 
@@ -63,7 +73,7 @@ pub fn spawn_bullet(
     if let Ok(camera_transform) = camera_query.get_single() {
         let bullet_direction: Vec3 = camera_transform.0.forward().into();
         commands.spawn((
-            Mesh3d(meshes.add(Mesh::from(Sphere::new(0.1)))),
+            Mesh3d(meshes.add(Mesh::from(Sphere::new(0.05)))),
             MeshMaterial3d(materials.add(StandardMaterial {
                 base_color: Srgba::hex("#ffd891").unwrap().into(),
                 ..default()

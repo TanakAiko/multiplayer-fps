@@ -45,6 +45,7 @@ fn spawn_player(commands: &mut Commands, res_player: &Res<PlayerResource>) -> En
             player: Player {
                 name: res_player.name.clone(),
                 position: res_player.position,
+                shoot_timer: Timer::from_seconds(0.1, TimerMode::Repeating),
                 // health: 100.
             },
             camera_sensitivity: CameraSensitivity::default(),

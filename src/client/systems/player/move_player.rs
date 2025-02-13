@@ -1,13 +1,16 @@
 use bevy::prelude::*;
 
 use crate::client::{
-    components::player_component::Player, resources::player_resource::PlayerResource,
+    components::player_component::{Player, PlayerStep},
+    resources::player_resource::PlayerResource,
+    systems::player::step::playsoundsprint,
 };
 
 pub fn move_player(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     mut query: Query<&mut Transform, With<Player>>,
     mut res_player: ResMut<PlayerResource>,
+    music_controller: Query<&AudioSink, With<PlayerStep>>,
 ) {
     const SPEED: f32 = 0.1;
     let mut direction = Vec3::ZERO;
@@ -38,5 +41,8 @@ pub fn move_player(
             * SPEED;
         transform.translation += move_direction;
         res_player.position = transform.translation.clone();
+
+        let is_moving = direction != Vec3::ZERO;
+        playsoundsprint(&music_controller, is_moving);
     }
 }

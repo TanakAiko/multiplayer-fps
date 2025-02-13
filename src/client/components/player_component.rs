@@ -4,6 +4,7 @@ use bevy::prelude::*;
 pub struct Player {
     pub name: String,
     pub position: Vec3,
+    pub shoot_timer: Timer,
     // pub health: f32
 }
 
@@ -21,3 +22,9 @@ pub struct PhysicalTranslation(pub Vec3);
 
 #[derive(Debug, Component, Clone, Copy, PartialEq, Default, Deref, DerefMut)]
 pub struct PreviousPhysicalTranslation(pub Vec3);
+
+#[derive(Component)]
+pub struct PlayerStep;
+
+#[derive(Component)]
+pub struct PlayerShoot;
