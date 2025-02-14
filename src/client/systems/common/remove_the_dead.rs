@@ -1,8 +1,9 @@
-
-
 use bevy::prelude::*;
 
-use crate::client::{components::{enemy_component::Enemy, player_component::Player}, systems::page_system::setup_game_over_system::spawn_game_over_ui};
+use crate::client::{
+    components::{enemy_component::Enemy, player_component::Player},
+    systems::page_system::setup_game_over_system::spawn_game_over_ui,
+};
 
 pub fn despawn_the_dead(
     mut commands: Commands,
@@ -20,11 +21,12 @@ pub fn despawn_the_dead(
 
         // Attendre un peu avant de quitter
         std::thread::sleep(std::time::Duration::from_secs(2));
-        
     }
 
     for (parent, enemy) in query.iter() {
+        println!("lolo");
         if enemy.name == name {
+            println!("lala");
             commands.entity(parent.get()).despawn_recursive();
         }
     }

@@ -8,6 +8,7 @@ use crate::{
             camera_component::CameraSensitivity,
             enemy_component::Enemy,
             player_component::{Player, PlayerShoot},
+            world_component::WallModel,
         },
         resources::network_resource::NetworkResource,
         systems::common::remove_the_dead::despawn_the_dead,
@@ -105,6 +106,29 @@ pub fn update_bullets(
         bullet.lifetime.tick(time.delta());
         if bullet.lifetime.finished() {
             commands.entity(entity).despawn();
+        }
+    }
+}
+
+pub fn handle_wall_collision(
+    mut commands: Commands,
+    bullets: Query<(Entity, &Bullet)>,
+    mut collision_events: EventReader<CollisionEvent>,
+    wall_query: Query<Entity, With<WallModel>>,
+) {
+    for collision_event in collision_events.read() {
+        if let CollisionEvent::Started(entity1, entity2, _) = collision_event {
+            let bullet_result = bullets.get(*entity1).or_else(|_| bullets.get(*entity2));
+            let other_entity = if bullets.get(*entity1).is_ok() {
+                *entity2
+            } else {
+                *entity1
+            };
+            if let Ok((bullet_entity, _)) = bullet_result {
+                if let Ok(_) = wall_query.get(other_entity) {
+                    commands.entity(bullet_entity).despawn();
+                }
+            }
         }
     }
 }

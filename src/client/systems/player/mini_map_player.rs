@@ -27,21 +27,21 @@ pub fn spawn_mini_map_player(mut commands: Commands, res_player: &Res<PlayerReso
 
 pub fn update_minimap_player(
     mut minimap_query: Query<&mut Transform, With<MiniMapPlayer>>, // 🔹 Récupère l'icône du joueur
-    window_query: Query<&Window>,
+    _window_query: Query<&Window>,
     res_player: Res<PlayerResource>,
 ) {
     if let Ok(mut minimap_transform) = minimap_query.get_single_mut() {
-        println!("res_player.position: {}", res_player.position);
-        let window = window_query.single();
-        let window_width = window.width();
-        let window_height = window.height();
+        // println!("res_player.position: {}", res_player.position);
+        // let window = window_query.single();
+        // let window_width = window.width();
+        // let window_height = window.height();
 
-        println!(
-            "window_height: {} || window_width: {}",
-            window_height, window_width
-        );
+        // println!(
+        //     "window_height: {} || window_width: {}",
+        //     window_height, window_width
+        // );
 
-        let minimap_x = (res_player.position.x * 5.0) - 525.; // 🔄 Échelle arbitraire (à ajuster)
+        let minimap_x = (res_player.position.x * 5.0) - 525.; 
         let minimap_y = (res_player.position.z * 5.0) - 260.;
 
         minimap_transform.translation.x = minimap_x;

@@ -1,4 +1,6 @@
-use crate::client::resources::world_resource::MazeResource;
+use crate::client::{
+    components::world_component::WallModel, resources::world_resource::MazeResource,
+};
 use bevy::{color::palettes::tailwind, prelude::*};
 use bevy_rapier3d::prelude::*;
 
@@ -58,6 +60,7 @@ pub fn spawn_world_model(
                             5.0 / 2.,
                             (tile_size * spacing) / 2.,
                         ),
+                        WallModel,
                     ));
                 }
                 'f' => {}

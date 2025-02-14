@@ -6,7 +6,7 @@ use crate::client::systems::player::{
     rotate_player::rotate_player,
     send_update_player::send_player_updates,
     setup_player::setup,
-    shooting::{handle_bullet_collision, player_shooting, update_bullets},
+    shooting::{handle_bullet_collision, handle_wall_collision, player_shooting, update_bullets},
     step::{setupsoundshoot, setupsoundsprint},
 };
 
@@ -24,6 +24,7 @@ impl Plugin for PlayerPlugin {
                     player_shooting,
                     update_bullets,
                     handle_bullet_collision,
+                    handle_wall_collision,
                     update_minimap_player,
                 ),
             );
