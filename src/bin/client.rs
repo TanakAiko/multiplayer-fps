@@ -10,14 +10,15 @@ use multiplayer_fps::{
             player_resource::PlayerResource,
         },
         systems::{
-            common::{fps_display_system::{display_fps, setup_fps_counter}, window_config_system::config_window}, enemy::receiving_update_enemy::handle_network_messages
+            common::{fps_display_system::setup_fps_counter, window_config_system::config_window},
+            enemy::receiving_update_enemy::handle_network_messages,
         },
         udp::Client,
     },
     common::types::protocol::{CommonPlayer, Message},
 };
+// use rapier3d::crossbeam::epoch::Pointable;
 use tokio::runtime::Runtime;
-
 fn main() {
     // Créer le runtime une seule fois
     let runtime = Runtime::new().unwrap();
@@ -61,13 +62,14 @@ fn main() {
     }
     // println!("enemis {:?}", enemis);
     // println!("playr {:?}", playr);
-    
+
     App::new()
         .add_plugins((DefaultPlugins, WorldPlugin, PlayerPlugin, EnemyPlugin))
+        // .add_systems(Msaa::default())
         .insert_resource(NetworkResource::new(socket))
         .insert_resource(EnemyResource::new(enemis))
         .insert_resource(PlayerResource::new(playr))
         .add_systems(Startup, setup_fps_counter)
-        .add_systems(Update, (handle_network_messages, config_window, display_fps))
+        .add_systems(Update, (handle_network_messages, config_window))
         .run();
 }
