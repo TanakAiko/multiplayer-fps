@@ -44,7 +44,7 @@ pub fn handle_network_messages(
                         println!("Game Over, {} a perdu !", loser_name);
                         // despawn_ennemy(commands.reborrow(), loser_name, &enemy_query_2);
                         despawn_the_dead(commands.reborrow(), loser_name, &enemy_query_2, &query_player);
-                        exit_writer.send(AppExit::Success);
+                        // exit_writer.send(AppExit::Success);
                     }
                     Message::Win => {
                         println!("Nahhh, I'd Win !!! 😎🔥");
