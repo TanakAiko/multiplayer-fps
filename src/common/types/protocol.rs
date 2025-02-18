@@ -24,11 +24,13 @@ pub enum Message {
     PlayerUpdateSending {
         position: Vec3,
         rotation: Quat,
+        all_dead_players: Vec<String>,
     },
     PlayerUpdateReceiving {
         name: String,
         position: Vec3,
         rotation: Quat,
+        all_dead_players: Vec<String>,
     },
     StartGame {
         player: CommonPlayer,

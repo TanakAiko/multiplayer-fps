@@ -10,7 +10,7 @@ use crate::{
             player_component::{Player, PlayerShoot},
             world_component::WallModel,
         },
-        resources::network_resource::NetworkResource,
+        resources::{enemy_resource::EnemyResource, network_resource::NetworkResource},
         systems::common::remove_the_dead::despawn_the_dead,
     },
     common::types::protocol::Message,
@@ -142,6 +142,7 @@ pub fn handle_bullet_collision(
     player_query: Single<(Entity, &Player)>,
     mut collision_events: EventReader<CollisionEvent>,
     network: ResMut<NetworkResource>,
+    mut enemy_resource: ResMut<EnemyResource>,
 ) {
     for collision_event in collision_events.read() {
         if let CollisionEvent::Started(entity1, entity2, _) = collision_event {
@@ -162,7 +163,7 @@ pub fn handle_bullet_collision(
                         // commands.entity(player_entity.1.get()).despawn_recursive();
                         despawn_the_dead(
                             commands.reborrow(),
-                            player_entity.2.name.clone(),
+                            enemy_resource.dead_players.clone(),
                             &enemies_query_2,
                             &player_query,
                         );
@@ -170,10 +171,15 @@ pub fn handle_bullet_collision(
                             loser_name: player_entity.2.name.clone(),
                         };
 
+                        enemy_resource.dead_players.push(player_entity.2.name.clone());
+
                         let encoded = bincode::serialize(&game_over).unwrap();
-                        if let Err(e) = network.socket.try_send(&encoded) {
-                            error!("Erreur d'envoi: {}", e);
-                        }
+
+                        
+                            if let Err(e) = network.socket.try_send(&encoded) {
+                                error!("Erreur d'envoi: {}", e);
+                            }
+                        
                     }
                 }
             }

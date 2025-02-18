@@ -4,7 +4,8 @@ use crate::{client::components::enemy_component::Enemy, common::types::protocol:
 
 #[derive(Debug, Resource)]
 pub struct EnemyResource {
-    pub enemies : Vec<Enemy>
+    pub enemies : Vec<Enemy>,
+    pub dead_players: Vec<String>,
 }
 
 impl EnemyResource {
@@ -19,7 +20,8 @@ impl EnemyResource {
         }
 
         EnemyResource {
-            enemies
+            enemies,
+            dead_players: Vec::new(),
         }
     }
 }
