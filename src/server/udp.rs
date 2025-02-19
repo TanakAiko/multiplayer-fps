@@ -90,12 +90,13 @@ impl Server {
                 self.handle_join(sock, addr, name).await?;
             }
             Message::Leave => todo!(),
-            Message::PlayerUpdateSending { position, rotation } => {
+            Message::PlayerUpdateSending { position, rotation , all_dead_players} => {
                 let (name, _) = self.clients.read().await.get(&addr).cloned().unwrap();
                 let update = Message::PlayerUpdateReceiving {
                     name,
                     position,
                     rotation,
+                    all_dead_players,
                 };
 
                 // println!("update: {:?}", update);
