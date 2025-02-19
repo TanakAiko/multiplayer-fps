@@ -32,7 +32,6 @@ pub fn handle_network_messages(
                         rotation,
                         all_dead_players
                     } => {
-                        // println!("All dead player {:?}", all_dead_players.clone());
                         move_enemy(
                             name,
                             position,

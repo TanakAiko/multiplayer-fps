@@ -13,11 +13,9 @@ pub fn despawn_the_dead(
     query_player: &Single<(Entity, &Player)>,
     
 ) {
-    println!("---------------------- dead players {:?}", all_dead_players);
     let player_name = query_player.1.name.clone();
     let _player_parent = query_player.0;
     for name in all_dead_players {
-        println!("player_name: {} et name: {}", player_name, name);
         if player_name == *name {
             // commands.entity(player_parent).despawn_recursive();
             spawn_game_over_ui(commands.reborrow());
@@ -31,12 +29,11 @@ pub fn despawn_the_dead(
             spawn_game_over_ui(commands.reborrow());
             println!("Nahhh, I'd Win !!! 😎🔥");
             // Attendre un peu avant de quitter
-            std::thread::sleep(std::time::Duration::from_secs(5));
+            std::thread::sleep(std::time::Duration::from_secs(2));
             std::process::exit(0);
         }
     
         for (parent, enemy) in query.iter() {
-            println!("The player : {} lose the game", name);
             if enemy.name == *name {
                 commands.entity(parent.get()).despawn_recursive();
             }
