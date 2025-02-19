@@ -34,6 +34,7 @@ pub fn handle_network_messages(
                         rotation,
                         all_dead_players
                     } => {
+                        // println!("All dead player {:?}", all_dead_players.clone());
                         move_enemy(
                             name,
                             position,
@@ -41,9 +42,9 @@ pub fn handle_network_messages(
                             enemy_query,
                             parent_query,
                         );
-                        let is_new_dead = add_dead_player_if_not_exists(enemy_resource.dead_players.clone(), all_dead_players);
+                        let is_new_dead = add_dead_player_if_not_exists(enemy_resource, all_dead_players.clone());
                         if is_new_dead {
-                            despawn_the_dead(commands.reborrow(), enemy_resource.dead_players.clone(), &enemy_query_2, &query_player);
+                            despawn_the_dead(commands.reborrow(),all_dead_players, &enemy_query_2, &query_player);
                         }
                     }
                     Message::GameOver { loser_name } => {
@@ -68,12 +69,12 @@ pub fn handle_network_messages(
 }
 
 pub fn add_dead_player_if_not_exists(
-    mut enemy_resource_dead: Vec<String>,
+    mut enemy_resource_dead: ResMut<EnemyResource>,
     dead_players: Vec<String>,
  ) -> bool {
     for dead_player in dead_players {
-        if !enemy_resource_dead.contains(&dead_player) {
-            enemy_resource_dead.push(dead_player);
+        if !enemy_resource_dead.dead_players.contains(&dead_player) {
+            enemy_resource_dead.dead_players.push(dead_player);
             return true;
         }
     }

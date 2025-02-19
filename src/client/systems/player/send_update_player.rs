@@ -23,8 +23,9 @@ pub fn send_player_updates(
         let update = Message::PlayerUpdateSending {
             position: transform.translation,
             rotation: transform.rotation,
-            all_dead_players: dead_players,
+            all_dead_players: dead_players.clone(),
         };
+        println!("dead players sender {:?}", dead_players);
 
         let encoded = bincode::serialize(&update).unwrap();
         if let Err(e) = network.socket.try_send(&encoded) {

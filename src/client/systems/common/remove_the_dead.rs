@@ -13,9 +13,11 @@ pub fn despawn_the_dead(
     query_player: &Single<(Entity, &Player)>,
     
 ) {
+    println!("---------------------- dead players {:?}", all_dead_players);
     let player_name = query_player.1.name.clone();
     let _player_parent = query_player.0;
     for name in all_dead_players {
+        println!("player_name: {} et name: {}", player_name, name);
         if player_name == name {
             // commands.entity(player_parent).despawn_recursive();
             spawn_game_over_ui(commands.reborrow());
