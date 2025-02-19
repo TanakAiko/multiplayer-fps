@@ -44,13 +44,8 @@ pub fn handle_network_messages(
                         );
                         let is_new_dead = add_dead_player_if_not_exists(enemy_resource, all_dead_players.clone());
                         if is_new_dead {
-                            despawn_the_dead(commands.reborrow(),all_dead_players, &enemy_query_2, &query_player);
+                            despawn_the_dead(commands.reborrow(), &all_dead_players, &enemy_query_2, &query_player);
                         }
-                    }
-                    Message::GameOver { loser_name } => {
-                        // println!("Game Over, {} a perdu !", loser_name);
-                        // despawn_ennemy(commands.reborrow(), loser_name, &enemy_query_2);
-                        // exit_writer.send(AppExit::Success);
                     }
                     Message::Win => {
                         println!("Nahhh, I'd Win !!! 😎🔥");

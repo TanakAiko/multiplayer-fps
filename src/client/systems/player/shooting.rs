@@ -163,23 +163,14 @@ pub fn handle_bullet_collision(
                         // commands.entity(player_entity.1.get()).despawn_recursive();
                         despawn_the_dead(
                             commands.reborrow(),
-                            enemy_resource.dead_players.clone(),
+                            &enemy_resource.dead_players.clone(),
                             &enemies_query_2,
                             &player_query,
                         );
-                        let game_over = Message::GameOver {
-                            loser_name: player_entity.2.name.clone(),
-                        };
 
-                        enemy_resource.dead_players.push(player_entity.2.name.clone());
-
-                        let encoded = bincode::serialize(&game_over).unwrap();
-
-                        
-                            if let Err(e) = network.socket.try_send(&encoded) {
-                                error!("Erreur d'envoi: {}", e);
-                            }
-                        
+                        enemy_resource
+                            .dead_players
+                            .push(player_entity.2.name.clone());
                     }
                 }
             }
