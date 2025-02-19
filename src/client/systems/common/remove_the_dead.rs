@@ -31,7 +31,7 @@ pub fn despawn_the_dead(
             spawn_game_over_ui(commands.reborrow());
             println!("Nahhh, I'd Win !!! 😎🔥");
             // Attendre un peu avant de quitter
-            std::thread::sleep(std::time::Duration::from_secs(2));
+            std::thread::sleep(std::time::Duration::from_secs(5));
             std::process::exit(0);
         }
     

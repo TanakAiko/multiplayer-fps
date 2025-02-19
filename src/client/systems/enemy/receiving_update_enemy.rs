@@ -1,4 +1,3 @@
-use bevy::app::AppExit;
 use bevy::prelude::*;
 
 use crate::{
@@ -16,7 +15,6 @@ pub fn handle_network_messages(
     enemy_query_2: Query<(&Parent, &Enemy), With<Enemy>>,
     // query_player: Query<(&Parent, &Player), With<Player>>,
     query_player: Single<(Entity, &Player)>,
-    mut exit_writer: EventWriter<AppExit>,
     parent_query: Query<&mut Transform>,
     enemy_resource: ResMut<EnemyResource>,
 ) {
@@ -46,14 +44,6 @@ pub fn handle_network_messages(
                         if is_new_dead {
                             despawn_the_dead(commands.reborrow(), &all_dead_players, &enemy_query_2, &query_player);
                         }
-                    }
-                    Message::Win => {
-                        println!("Nahhh, I'd Win !!! 😎🔥");
-                        exit_writer.send(AppExit::Success);
-                    }
-                    Message::Lose => {
-                        println!("You Loserrrrr ❌");
-                        exit_writer.send(AppExit::Success);
                     }
                     _ => todo!(),
                 }

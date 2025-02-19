@@ -1,8 +1,7 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
-use crate::{
-    client::{
+use crate::client::{
         components::{
             bullet::{Bullet, BulletDirection},
             camera_component::CameraSensitivity,
@@ -10,11 +9,9 @@ use crate::{
             player_component::{Player, PlayerShoot},
             world_component::WallModel,
         },
-        resources::{enemy_resource::EnemyResource, network_resource::NetworkResource},
+        resources::enemy_resource::EnemyResource,
         systems::common::remove_the_dead::despawn_the_dead,
-    },
-    common::types::protocol::Message,
-};
+    };
 
 use super::step::playsoundshoot;
 
@@ -141,7 +138,6 @@ pub fn handle_bullet_collision(
     // player_query: Query<(&Parent, &Player), With<Player>>,
     player_query: Single<(Entity, &Player)>,
     mut collision_events: EventReader<CollisionEvent>,
-    network: ResMut<NetworkResource>,
     mut enemy_resource: ResMut<EnemyResource>,
 ) {
     for collision_event in collision_events.read() {

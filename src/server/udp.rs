@@ -105,11 +105,6 @@ impl Server {
 
                 self.broadcast(sock, encoded_message).await?;
             }
-            Message::GameOver {
-                loser_name,
-            } => {
-                self.handle_game_over(sock, loser_name).await?;
-            }
             _ => todo!(),
         }
 
@@ -117,19 +112,6 @@ impl Server {
     }
 
     // async fn han
-
-    pub async fn handle_game_over(
-        &mut self,
-        sock: &UdpSocket,
-        loser_name: String,
-    ) -> Result<(), ServerError> {
-        // Notify the winner
-        let encoded_lose_message = bincode::serialize(&Message::GameOver { loser_name }).unwrap();
-
-        self.broadcast(sock, encoded_lose_message).await?;
-       
-        Ok(())
-    }
 
     pub async fn handle_join(
         &mut self,
