@@ -6,6 +6,15 @@ pub struct AnimationResource {
     pub graph_handle: Handle<AnimationGraph>, 
 }
 
+impl Default for AnimationResource {
+    fn default() -> Self {
+        Self {
+            animations: Vec::new(),
+            graph_handle: Default::default(),
+        }
+    }
+}    
+
 #[derive(Resource)]
 pub struct AnimationState {
     pub current_animation: usize,
