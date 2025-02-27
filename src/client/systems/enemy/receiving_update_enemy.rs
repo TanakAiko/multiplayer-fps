@@ -11,11 +11,11 @@ use crate::{
 pub fn handle_network_messages(
     network: Res<NetworkResource>,
     mut commands: Commands,
-    enemy_query: Query<(&Parent, &Enemy)>,
+    enemy_query: Query<(&mut Transform, &Enemy)>,
     enemy_query_2: Query<(&Parent, &Enemy), With<Enemy>>,
     // query_player: Query<(&Parent, &Player), With<Player>>,
     query_player: Single<(Entity, &Player)>,
-    parent_query: Query<&mut Transform>,
+    // parent_query: Query<&mut Transform>,
     enemy_resource: ResMut<EnemyResource>,
 ) {
     let mut buf = vec![0; 1024];
@@ -37,7 +37,7 @@ pub fn handle_network_messages(
                             position,
                             rotation,
                             enemy_query,
-                            parent_query,
+                            // parent_query,
                         );
                         let is_new_dead = add_dead_player_if_not_exists(enemy_resource, all_dead_players.clone());
                         if is_new_dead {
