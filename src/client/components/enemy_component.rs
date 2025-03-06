@@ -8,7 +8,6 @@ pub struct Enemy {
     pub position: Vec3,
     pub orientation: Quat,
     pub current_state: EnemyState,
-    pub animation_timer: Timer, 
 }
 
 
@@ -20,7 +19,6 @@ impl Default for Enemy {
             position: Vec3::ZERO,
             orientation: Quat::from_rotation_y(std::f32::consts::PI),
             current_state: EnemyState::Idle,
-            animation_timer: Timer::from_seconds(0.5, TimerMode::Once),
         }
     }
 }

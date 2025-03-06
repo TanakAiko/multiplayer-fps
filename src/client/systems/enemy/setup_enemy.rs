@@ -1,15 +1,9 @@
 use std::f32::consts::PI;
 
-use bevy::prelude::*;
+use bevy::{prelude::*, scene::SceneInstanceReady};
 use bevy_rapier3d::prelude::*;
 
-use crate::client::{
-    components::enemy_component::Enemy,
-    resources::{
-        animation_resource::{AnimationResource, AnimationState},
-        enemy_resource::EnemyResource,
-    },
-};
+use crate::client::{components::{animation_component::AnimationComponent, enemy_component::Enemy}, resources::enemy_resource::EnemyResource};
 
 const GLB_ENEMY: &str = "fps_enemy.glb";
 // const ENEMY_INITIAL_POSITION: Vec3 = Vec3::new(-12., -1., 13.); // C'est en faite la meme position que le player
@@ -19,7 +13,7 @@ lazy_static::lazy_static! {
 
 #[derive(Bundle, Debug, Default)]
 pub struct EnemyBundle {
-    // pub enemy: Enemy,
+    pub enemy: Enemy,
     transform: Transform,
     global_transform: GlobalTransform,
     visibility: Visibility,
@@ -36,55 +30,65 @@ pub fn spawn_enemy(
     mut commands: Commands,
     asset_server: &Res<AssetServer>,
     position: Vec3,
-    graphs: &mut ResMut<Assets<AnimationGraph>>,
+    graphs : &mut ResMut<Assets<AnimationGraph>>,
 ) {
+    
     let capsule_height = 1.01; // Hauteur du corps
     let capsule_radius = 0.305; // Rayon
     let collider_offset = capsule_height / 2.0;
-
+    
     // let scene_handle: Handle<Scene> = asset_server.load("fps_enemy.gltf#Scene0");
-    let scene_handle: SceneRoot =
-        SceneRoot(asset_server.load(GltfAssetLabel::Scene(0).from_asset(GLB_ENEMY)));
+    let scene_handle: SceneRoot =  SceneRoot(asset_server.load(GltfAssetLabel::Scene(0).from_asset(GLB_ENEMY)));
+    
+    let (idle_graph, _idle_index) = AnimationGraph::from_clip(
+        asset_server.load(GltfAssetLabel::Animation(4).from_asset(GLB_ENEMY))
+    );
+    let (run_graph, _) = AnimationGraph::from_clip(
+        asset_server.load(GltfAssetLabel::Animation(16).from_asset(GLB_ENEMY))
+    );
+    let (shoot_graph, _) = AnimationGraph::from_clip(
+        asset_server.load(GltfAssetLabel::Animation(1).from_asset(GLB_ENEMY))
+    );
+    let (death_graph, _) = AnimationGraph::from_clip(
+        asset_server.load(GltfAssetLabel::Animation(0).from_asset(GLB_ENEMY))
+    );
+    let (gun_pointing_graph, gun_pointing_index) = AnimationGraph::from_clip(
+        asset_server.load(GltfAssetLabel::Animation(6).from_asset(GLB_ENEMY))
+    );
 
-    let (graph, node_indices) = AnimationGraph::from_clips([
-        asset_server.load(GltfAssetLabel::Animation(4).from_asset(GLB_ENEMY)),
-        asset_server.load(GltfAssetLabel::Animation(16).from_asset(GLB_ENEMY)),
-        asset_server.load(GltfAssetLabel::Animation(1).from_asset(GLB_ENEMY)),
-        asset_server.load(GltfAssetLabel::Animation(0).from_asset(GLB_ENEMY)),
-        asset_server.load(GltfAssetLabel::Animation(6).from_asset(GLB_ENEMY)),
-    ]);
+    graphs.add(idle_graph);
+    graphs.add(run_graph);
+    graphs.add(shoot_graph);
+    graphs.add(death_graph);
+    let idle_graph_handle = graphs.add(gun_pointing_graph);
+    
+    let animation_to_play = AnimationComponent {
+        graph_handle: idle_graph_handle,
+        index: gun_pointing_index,
+    };
 
-    let graph_handle = graphs.add(graph);
-
-    commands.insert_resource(AnimationResource {
-        animations: node_indices,
-        graph_handle,
-    });
-
-    commands.insert_resource(AnimationState::default());
 
     commands
         .spawn((
             // SceneRoot(scene_handle), // 🔹 Modèle 3D
             scene_handle,
+            animation_to_play,
             AnimationPlayer::default(),
-            AnimationTransitions::default(),
             Transform {
                 translation: position, // 🔹 Position réelle de l'avatar (sans modification de Y)
                 rotation: *ENEMY_INITIAL_ROTATION,
                 scale: Vec3::ONE,
             },
-            Enemy {
-                name,
-                position,
-                orientation: *ENEMY_INITIAL_ROTATION,
-                current_state: Default::default(), // Idle
-                animation_timer: Timer::from_seconds(0.5, TimerMode::Once),
-            },
             GlobalTransform::default(),
-        ))
+        )).observe(play_animation_when_ready)
         .with_children(|parent| {
             parent.spawn((EnemyBundle {
+                enemy: Enemy {
+                    name,
+                    position,
+                    orientation: *ENEMY_INITIAL_ROTATION,
+                    current_state: Default::default(), // Idle
+                },
                 transform: Transform {
                     translation: Vec3::new(0.0, collider_offset, 0.0), // 🔹 Seul le collider est déplacé
                     ..Default::default()
@@ -101,11 +105,40 @@ pub fn spawn_enemy(
         });
 }
 
+fn play_animation_when_ready(
+    trigger: Trigger<SceneInstanceReady>, // Déclenché quand une scène 3D est chargée
+    mut commands: Commands,
+    children: Query<&Children>,  // Pour accéder aux enfants des entités
+    animations_to_play: Query<&AnimationComponent>, // Les animations à jouer
+    mut players: Query<&mut AnimationPlayer>, // Les lecteurs d'animation
+) {
+    if let Ok(animation_to_play) = animations_to_play.get(trigger.entity()) {
+        for child in children.iter_descendants(trigger.entity()) {
+            
+            if let Ok(mut player) = players.get_mut(child) {
+                // T start the animation and keep
+                // repeating it.
+                //
+                // If you want to try stopping and switching animations, see the
+                // `animated_mesh_control.rs` example.
+                player.play(animation_to_play.index);
+
+                // Add the animation graph. This only needs to be done once to
+                // connect the animation player to the mesh.
+                commands
+                    .entity(child)
+                    .insert(AnimationGraphHandle(animation_to_play.graph_handle.clone()));
+            }
+        }
+    }
+
+}
+
 pub fn spawn_all_enemies(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     enemy_resource: Res<EnemyResource>,
-    mut graph: ResMut<Assets<AnimationGraph>>,
+    mut graph : ResMut<Assets<AnimationGraph>>
 ) {
     for enemy in enemy_resource.enemies.iter() {
         println!("enemy {:?}", enemy);

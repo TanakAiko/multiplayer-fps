@@ -1,35 +1,32 @@
 
-use std::time::Duration;
+use bevy::{prelude::*, utils::HashMap};
 
-use bevy::prelude::*;
-
-use crate::client::{components::enemy_component::Enemy, resources::animation_resource::{AnimationResource, AnimationState}};
+use crate::client::{components::enemy_component::Enemy, resources::enemy_resource::EnemyState};
 
 pub fn handle_enemy_animations(
-    animations: Res<AnimationResource>,
-    animation_state: Res<AnimationState>,
-    mut players: Query<(Entity, &mut AnimationPlayer)>,
-    mut commands: Commands,
+    mut query: Query<(&Enemy, &Children, &mut AnimationPlayer)>,
+    mut prev_states: Local<HashMap<String, EnemyState>>,
 ) {
-    println!("Handle enemy animations");
-    for (entity, mut player) in &mut players {
-        info!(" --------------------------------------------------- Handle enemy animations");
-        let mut transitions = AnimationTransitions::new();
-        
-        // Démarrer avec l'animation idle
-        transitions
-            .play(&mut player, animations.animations[animation_state.current_animation], Duration::ZERO)
-            .repeat();
+    for (enemy, _children, mut animation_player) in query.iter_mut() {
+        let prev_state = prev_states.get(&enemy.name).unwrap_or(&EnemyState::Idle);
+        println!("prev_state: {:?}, current_state: {:?}", prev_state, enemy.current_state);
+        if prev_state != &enemy.current_state {
+            let index = match enemy.current_state {
+                EnemyState::Idle => 4,
+                EnemyState::Run => 16,
+                EnemyState::GunPointing => 6,
+                EnemyState::Death => 0,
+                EnemyState::Shoot => 1,
+            };
+            animation_player.play(AnimationNodeIndex::new(index));
 
-        commands
-            .entity(entity)
-            .insert(AnimationGraphHandle(animations.graph_handle.clone()))
-            .insert(transitions);
+            prev_states.insert(enemy.name.clone(), enemy.current_state.clone());
+        }
     }
 }
 
 
-/* pub fn update_enemy_state(
+pub fn update_enemy_state(
     mut enemies: Query<(&mut Enemy, &Transform)>,
 ) {
     for (mut enemy, transform) in enemies.iter_mut() {
@@ -41,49 +38,5 @@ pub fn handle_enemy_animations(
         };
         
 
-    }
-} */
-
-pub fn update_enemy_state(
-    mut animation_players: Query<(&mut AnimationPlayer, &mut AnimationTransitions, &mut Enemy, &Transform)>,
-    animations: Res<AnimationResource>,
-    mut animation_state: ResMut<AnimationState>,
-    time: Res<Time>,
-) {
-    println!("Update enemy state");
-    for (mut player, mut transitions, mut enemy, transform) in &mut animation_players {
-        // Exemple de logique pour changer d'animation selon l'état
-        // 2 = gun shooting
-        // 0 = idle
-        // 1 = run
-        // 3 = death
-        // 4 = hit
-        let mut new_animation = 1;
-        println!("--------------------------------=-Distance: {}", transform.translation.distance(enemy.position));
-        if transform.translation.distance(enemy.position) != 0. {
-            println!("Runnniiiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnnngggggggggggggggggggggggggggggg");
-            new_animation = 2;
-            enemy.animation_timer.reset();
-        } else {
-            // Si on ne bouge pas, on vérifie le timer
-            enemy.animation_timer.tick(time.delta());
-            
-            // Si le timer n'est pas fini, on maintient l'animation de course
-            if !enemy.animation_timer.finished() {
-                new_animation = 2;
-            }
-        }
-        enemy.position = transform.translation;
-        
-        // Changer l'animation si nécessaire
-        if animation_state.current_animation != new_animation {
-            println!("/////////////////////////////////////");
-            animation_state.current_animation = new_animation;
-            transitions.play(
-                &mut player,
-                animations.animations[new_animation],
-                Duration::from_millis(300),
-            ).repeat();
-        }
     }
 }

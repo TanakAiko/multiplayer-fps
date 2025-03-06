@@ -24,7 +24,7 @@ use crate::client::{resources::world_resource::MazeResource, systems::camera::se
             commands.spawn((
                 PointLight {
                     intensity: 1000000.0,
-                    shadows_enabled: true,
+                    shadows_enabled: false,
                     range: 30.0, // Portée de la lumière
                     radius: 2.0, // Taille de la source
                     ..default()

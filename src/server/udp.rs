@@ -7,12 +7,13 @@ use tokio::{net::UdpSocket, sync::RwLock};
 pub struct Server {
     is_game_started: bool,
     nbr_of_player: u8,
+    all_dead_players: Vec<String>,
     clients: Arc<RwLock<HashMap<SocketAddr, (String, Vec3)>>>,
     next_position_index: usize,
 }
 
 impl Server {
-    // Complete nombre possible de joueur
+    // Complete number possible players
     const POSITIONS: [Vec3; 10] = [
         Vec3::new(-18.0, 0., 13.0),
         Vec3::new(-18.0, 0., -15.0),
@@ -30,6 +31,7 @@ impl Server {
         Server {
             is_game_started: false,
             nbr_of_player: nbr_player,
+            all_dead_players: Vec::new(),
             clients: Arc::new(RwLock::new(HashMap::new())),
             next_position_index: 0,
         }
@@ -55,22 +57,35 @@ impl Server {
             .await
             .map_err(|e| ServerError::ConnectionError { source: e })?;
 
-        println!("Serveur écoute sur {:?}", sock.local_addr().unwrap());
+        println!("Server listens to {:?}", sock.local_addr().unwrap());
 
         let mut buf = vec![0; 1024];
 
         loop {
+            let encoded_message = bincode::serialize(&Message::DeadPlayer {
+                all_dead_players: self.all_dead_players.clone(),
+            })
+            .unwrap();
+            self.broadcast(&sock, encoded_message).await?;
+
             let result = self.handle_client_message(&sock, &mut buf).await;
             match result {
                 Ok(()) => continue,
                 Err(e) => {
-                    eprintln!("Erreur lors du traitement du message: {}", e);
-                    // Selon la gravité de l'erreur, on peut décider de continuer ou d'arrêter
+                    eprintln!("Error when processing the message: {}", e);
                     match e {
                         ServerError::InvalidMessage(_) | ServerError::InvalidClient(_) => continue, // Erreurs non-fatales
-                        _ => return Err(e), // Erreurs fatales
+                        _ => return Err(e), // Fatal errors
                     }
                 }
+            }
+        }
+    }
+
+    pub fn add_dead_player_if_not_exists(&mut self, new_tab: Vec<String>) {
+        for dead_player in new_tab {
+            if !self.all_dead_players.contains(&dead_player) {
+                self.all_dead_players.push(dead_player);
             }
         }
     }
@@ -90,16 +105,19 @@ impl Server {
                 self.handle_join(sock, addr, name).await?;
             }
             Message::Leave => todo!(),
-            Message::PlayerUpdateSending { position, rotation , all_dead_players} => {
+            Message::PlayerUpdateSending {
+                position,
+                rotation,
+                all_dead_players,
+            } => {
+                self.add_dead_player_if_not_exists(all_dead_players.clone());
+
                 let (name, _) = self.clients.read().await.get(&addr).cloned().unwrap();
                 let update = Message::PlayerUpdateReceiving {
                     name,
                     position,
                     rotation,
-                    all_dead_players,
                 };
-
-                // println!("update: {:?}", update);
 
                 let encoded_message = bincode::serialize(&update).unwrap();
 
@@ -111,8 +129,6 @@ impl Server {
         Ok(())
     }
 
-    // async fn han
-
     pub async fn handle_join(
         &mut self,
         sock: &UdpSocket,
@@ -123,23 +139,23 @@ impl Server {
             return Ok(());
         }
 
-        // Vérification du nom
+        // Name verification
         if name.trim().is_empty() {
-            return Err(ServerError::InvalidClient("Nom vide non autorisé".into()));
+            return Err(ServerError::InvalidClient("Unauthorized empty name".into()));
         }
-        // Vérification de la longueur du nom
-        // Creation d'un scope pour limiter la visibilité de clients
+        // Verification of the length of the name
+        // Scope creation to limit customer visibility
         {
             let clients = self.clients.read().await;
             if clients
                 .values()
                 .any(|(existing_name, _)| existing_name == &name)
             {
-                return Err(ServerError::InvalidClient("Nom déjà utilisé".into()));
+                return Err(ServerError::InvalidClient("Name already used".into()));
             }
         }
 
-        println!("Nouveau client connecté: {} depuis {}", name, addr);
+        println!("New connected customer: {} from {}", name, addr);
         if self.next_position_index >= Self::POSITIONS.len() {
             return Err(ServerError::InvalidClient("Server is full".into()));
         }
@@ -196,8 +212,8 @@ impl Server {
 
         for client_addr in connected_clients.keys() {
             if let Err(e) = sock.send_to(&encoded_message, client_addr).await {
-                eprintln!("Erreur d'envoi à {}: {}", client_addr, e);
-                // On continue malgré l'erreur pour les autres clients
+                eprintln!("Sending error to {}: {}", client_addr, e);
+                // We continue despite the error for other customers
                 continue;
             }
         }
@@ -206,7 +222,7 @@ impl Server {
     }
 
     pub fn start_server() -> Result<(), ServerError> {
-        print!("Entrez le nombre de player : (default 2) ");
+        print!("Enter the number of player: (Default 2)");
         std::io::stdout().flush().unwrap();
 
         let mut player_count = String::new();
@@ -217,7 +233,7 @@ impl Server {
         // Stop server if player count is more than 10
         if player_count.trim().parse::<usize>().unwrap_or(2) > 10 {
             return Err(ServerError::InvalidClient(
-                "Nombre de joueurs invalide".into(),
+                "Number of invalid players".into(),
             ));
         }
 

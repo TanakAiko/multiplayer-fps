@@ -7,14 +7,14 @@ use crate::{
     common::types::protocol::Message,
 };
 
-const UPDATE_FREQUENCY: f32 = 1. / 20.; // 20 Hz ;
+const UPDATE_FREQUENCY: f32 = 1. / 60.; // 20 Hz ;
 
 pub fn send_player_updates(
     mut network: ResMut<NetworkResource>,
     ennemy_resource: Res<EnemyResource>,
     query: Query<(&Transform, &Player)>,
 ) {
-     if network.last_sent.elapsed().as_secs_f32() < UPDATE_FREQUENCY {
+     if network.last_sent.elapsed().as_secs_f32() <= UPDATE_FREQUENCY {
         return;
      }
 
@@ -25,6 +25,7 @@ pub fn send_player_updates(
             rotation: transform.rotation,
             all_dead_players: dead_players.clone(),
         };
+        println!("dead players sender {:?}", dead_players);
 
         let encoded = bincode::serialize(&update).unwrap();
         if let Err(e) = network.socket.try_send(&encoded) {

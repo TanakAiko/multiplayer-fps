@@ -25,7 +25,8 @@ pub fn despawn_the_dead(
             std::process::exit(0);
         }
 
-        if all_dead_players.len() == query.iter().count() {
+        println!("all_dead_players.len(): {}  ||  query.iter().count(): {}", all_dead_players.len(), query.iter().count());
+        if all_dead_players.len() >= query.iter().count() {
             spawn_game_over_ui(commands.reborrow());
             println!("Nahhh, I'd Win !!! 😎🔥");
             // Attendre un peu avant de quitter

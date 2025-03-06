@@ -30,11 +30,13 @@ pub enum Message {
         name: String,
         position: Vec3,
         rotation: Quat,
-        all_dead_players: Vec<String>,
     },
     StartGame {
         player: CommonPlayer,
         enemies: Vec<CommonPlayer>,
+    },
+    DeadPlayer {
+        all_dead_players: Vec<String>,
     },
     Leave,
 }

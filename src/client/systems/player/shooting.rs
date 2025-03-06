@@ -2,16 +2,15 @@ use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
 use crate::client::{
-        components::{
-            bullet::{Bullet, BulletDirection},
-            camera_component::CameraSensitivity,
-            enemy_component::Enemy,
-            player_component::{Player, PlayerShoot},
-            world_component::WallModel,
-        },
-        resources::enemy_resource::EnemyResource,
-        systems::common::remove_the_dead::despawn_the_dead,
-    };
+    components::{
+        bullet::{Bullet, BulletDirection},
+        camera_component::CameraSensitivity,
+        enemy_component::Enemy,
+        player_component::{Player, PlayerShoot},
+        world_component::WallModel,
+    },
+    resources::enemy_resource::EnemyResource,
+};
 
 use super::step::playsoundshoot;
 
@@ -88,6 +87,7 @@ pub fn spawn_bullet(
             },
             RigidBody::Dynamic,
             Collider::ball(0.1),
+            GravityScale(0.),
         ));
     }
 }
@@ -134,9 +134,7 @@ pub fn handle_bullet_collision(
     mut commands: Commands,
     bullets: Query<(Entity, &Bullet)>,
     enemies_query: Query<(Entity, &Parent, &Enemy), With<Enemy>>,
-    enemies_query_2: Query<(&Parent, &Enemy), With<Enemy>>,
     // player_query: Query<(&Parent, &Player), With<Player>>,
-    player_query: Single<(Entity, &Player)>,
     mut collision_events: EventReader<CollisionEvent>,
     mut enemy_resource: ResMut<EnemyResource>,
 ) {
@@ -157,12 +155,12 @@ pub fn handle_bullet_collision(
                         commands.entity(bullet_entity).despawn();
 
                         // commands.entity(player_entity.1.get()).despawn_recursive();
-                        despawn_the_dead(
-                            commands.reborrow(),
-                            &enemy_resource.dead_players.clone(),
-                            &enemies_query_2,
-                            &player_query,
-                        );
+                        // despawn_the_dead(
+                        //     commands.reborrow(),
+                        //     &enemy_resource.dead_players.clone(),
+                        //     &enemies_query_2,
+                        //     &player_query,
+                        // );
 
                         enemy_resource
                             .dead_players
