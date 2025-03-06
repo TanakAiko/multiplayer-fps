@@ -137,6 +137,7 @@ pub fn handle_bullet_collision(
     // player_query: Query<(&Parent, &Player), With<Player>>,
     mut collision_events: EventReader<CollisionEvent>,
     mut enemy_resource: ResMut<EnemyResource>,
+    query: Query<(&Parent, &Enemy), With<Enemy>>,
 ) {
     for collision_event in collision_events.read() {
         if let CollisionEvent::Started(entity1, entity2, _) = collision_event {
@@ -161,6 +162,19 @@ pub fn handle_bullet_collision(
                         //     &enemies_query_2,
                         //     &player_query,
                         // );
+                        let all_dead_players = &enemy_resource.dead_players.clone();
+                        println!(
+                            "all_dead_players.len(): {}  ||  query.iter().count(): {}",
+                            all_dead_players.len(),
+                            query.iter().count()
+                        );
+                        if all_dead_players.len() >= query.iter().count() {
+                            // spawn_game_over_ui(commands.reborrow());
+                            println!("Nahhh, I'd Win !!! 😎🔥");
+                            // Attendre un peu avant de quitter
+                            std::thread::sleep(std::time::Duration::from_secs(2));
+                            std::process::exit(0);
+                        }
 
                         enemy_resource
                             .dead_players
