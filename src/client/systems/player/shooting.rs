@@ -5,16 +5,19 @@ use std::time::Instant;
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
-use crate::{client::{
-    components::{
-        bullet::{Bullet, BulletDirection},
-        camera_component::CameraSensitivity,
-        enemy_component::Enemy,
-        player_component::{Player, PlayerShoot},
-        world_component::WallModel,
+use crate::{
+    client::{
+        components::{
+            bullet::{Bullet, BulletDirection},
+            camera_component::CameraSensitivity,
+            enemy_component::Enemy,
+            player_component::{Player, PlayerShoot},
+            world_component::WallModel,
+        },
+        resources::{self, enemy_resource::EnemyResource, network_resource::NetworkResource},
     },
-    resources::{enemy_resource::EnemyResource, network_resource::NetworkResource},
-}, common::types::protocol::Message};
+    common::types::protocol::Message,
+};
 
 use super::step::playsoundshoot;
 
@@ -178,40 +181,32 @@ pub fn handle_bullet_collision(
                             query.iter().count()
                         );
 
-                        enemy_resource
-                            .dead_players
-                            .push(player_entity.2.name.clone());
+                        if !enemy_resource.dead_players.contains(&player_entity.2.name) {
+                            enemy_resource
+                                .dead_players
+                                .push(player_entity.2.name.clone());
+                        }
 
-                        
+                        if network.last_sent.elapsed().as_secs_f32() <= UPDATE_FREQUENCY {
+                            return;
+                        }
 
+                        if let Ok((transform, _)) = query_player.get_single() {
+                            let dead_players = enemy_resource.dead_players.clone();
+                            let update = Message::PlayerUpdateSending {
+                                position: transform.translation,
+                                rotation: transform.rotation,
+                                all_dead_players: dead_players.clone(),
+                            };
+                            // println!("dead players sender {:?}", dead_players);
 
-
-
-                            if network.last_sent.elapsed().as_secs_f32() <= UPDATE_FREQUENCY {
-                                return;
-                             }
-                        
-                            if let Ok((transform, _)) = query_player.get_single() {
-                                let dead_players = enemy_resource.dead_players.clone();
-                                let update = Message::PlayerUpdateSending {
-                                    position: transform.translation,
-                                    rotation: transform.rotation,
-                                    all_dead_players: dead_players.clone(),
-                                };
-                                // println!("dead players sender {:?}", dead_players);
-                        
-                                let encoded = bincode::serialize(&update).unwrap();
-                                if let Err(e) = network.socket.try_send(&encoded) {
-                                    error!("Erreur d'envoi: {}", e);
-                                }
+                            let encoded = bincode::serialize(&update).unwrap();
+                            if let Err(e) = network.socket.try_send(&encoded) {
+                                error!("Erreur d'envoi: {}", e);
                             }
-                            
-                            network.last_sent = Instant::now();
+                        }
 
-
-
-
-
+                        network.last_sent = Instant::now();
 
                         if all_dead_players.len() >= query.iter().count() {
                             // spawn_game_over_ui(commands.reborrow());

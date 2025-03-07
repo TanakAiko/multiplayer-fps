@@ -3,20 +3,23 @@ use std::time::Instant;
 use bevy::prelude::*;
 
 use crate::{
-    client::{components::player_component::Player, resources::{enemy_resource::EnemyResource, network_resource::NetworkResource}},
+    client::{
+        components::player_component::Player,
+        resources::{enemy_resource::EnemyResource, network_resource::NetworkResource},
+    },
     common::types::protocol::Message,
 };
 
-const UPDATE_FREQUENCY: f32 = 1. / 60.; // 20 Hz ;
+const UPDATE_FREQUENCY: f32 = 1. / 50.; // 20 Hz ;
 
 pub fn send_player_updates(
     mut network: ResMut<NetworkResource>,
     ennemy_resource: Res<EnemyResource>,
     query: Query<(&Transform, &Player)>,
 ) {
-     if network.last_sent.elapsed().as_secs_f32() <= UPDATE_FREQUENCY {
+    if network.last_sent.elapsed().as_secs_f32() <= UPDATE_FREQUENCY {
         return;
-     }
+    }
 
     if let Ok((transform, _)) = query.get_single() {
         let dead_players = ennemy_resource.dead_players.clone();
