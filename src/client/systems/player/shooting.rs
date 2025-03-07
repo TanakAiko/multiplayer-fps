@@ -14,7 +14,7 @@ use crate::{
             player_component::{Player, PlayerShoot},
             world_component::WallModel,
         },
-        resources::{self, enemy_resource::EnemyResource, network_resource::NetworkResource},
+        resources::{enemy_resource::EnemyResource, network_resource::NetworkResource},
     },
     common::types::protocol::Message,
 };

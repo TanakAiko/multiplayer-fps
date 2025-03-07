@@ -12,7 +12,7 @@ pub fn move_player(
     mut res_player: ResMut<PlayerResource>,
     music_controller: Query<&AudioSink, With<PlayerStep>>,
 ) {
-    const SPEED: f32 = 0.1;
+    const SPEED: f32 = 0.06;
     let mut direction = Vec3::ZERO;
 
     for mut transform in query.iter_mut() {

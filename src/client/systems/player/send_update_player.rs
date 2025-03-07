@@ -10,7 +10,7 @@ use crate::{
     common::types::protocol::Message,
 };
 
-const UPDATE_FREQUENCY: f32 = 1. / 50.; // 20 Hz ;
+const UPDATE_FREQUENCY: f32 = 1. / 100.; // 20 Hz ;
 
 pub fn send_player_updates(
     mut network: ResMut<NetworkResource>,
