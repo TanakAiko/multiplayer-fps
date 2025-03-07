@@ -16,6 +16,7 @@ pub fn despawn_the_dead(
     let _player_parent = query_player.0;
 
     for name in all_dead_players {
+        print!("name: {} || player_name: {} \n", name, player_name);
         if player_name == *name {
             // commands.entity(player_parent).despawn_recursive();
             spawn_game_over_ui(commands.reborrow());
@@ -30,14 +31,6 @@ pub fn despawn_the_dead(
             all_dead_players.len(),
             query.iter().count()
         );
-        
-        if all_dead_players.len() >= query.iter().count() {
-            // spawn_game_over_ui(commands.reborrow());
-            println!("Nahhh, I'd Win !!! 😎🔥");
-            // Attendre un peu avant de quitter
-            std::thread::sleep(std::time::Duration::from_secs(2));
-            std::process::exit(0);
-        }
 
         for (parent, enemy) in query.iter() {
             if enemy.name == *name {
