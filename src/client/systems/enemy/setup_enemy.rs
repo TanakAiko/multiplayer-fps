@@ -3,7 +3,7 @@ use std::f32::consts::PI;
 use bevy::{prelude::*, scene::SceneInstanceReady};
 use bevy_rapier3d::prelude::*;
 
-use crate::client::{components::{animation_component::AnimationComponent, enemy_component::Enemy}, resources::enemy_resource::EnemyResource};
+use crate::client::{components::{animation_component::AnimationComponent, enemy_component::{Enemy, EnemyMovement}}, resources::enemy_resource::EnemyResource};
 
 const GLB_ENEMY: &str = "fps_enemy.glb";
 // const ENEMY_INITIAL_POSITION: Vec3 = Vec3::new(-12., -1., 13.); // C'est en faite la meme position que le player
@@ -14,6 +14,7 @@ lazy_static::lazy_static! {
 #[derive(Bundle, Debug, Default)]
 pub struct EnemyBundle {
     pub enemy: Enemy,
+    enemy_movement: EnemyMovement,
     transform: Transform,
     global_transform: GlobalTransform,
     visibility: Visibility,
@@ -88,6 +89,11 @@ pub fn spawn_enemy(
                     position,
                     orientation: *ENEMY_INITIAL_ROTATION,
                     current_state: Default::default(), // Idle
+                },
+                enemy_movement: EnemyMovement {
+                    target_position: position,
+                    current_position: position,
+                    lerp_time: 0.0,
                 },
                 transform: Transform {
                     translation: Vec3::new(0.0, collider_offset, 0.0), // 🔹 Seul le collider est déplacé

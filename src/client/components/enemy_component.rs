@@ -22,3 +22,10 @@ impl Default for Enemy {
         }
     }
 }
+
+#[derive(Component, Default, Debug)]
+pub struct EnemyMovement {
+    pub target_position: Vec3,
+    pub current_position: Vec3,
+    pub lerp_time: f32,
+}

@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{
     client::{
-        components::{enemy_component::Enemy, player_component::Player}, resources::{enemy_resource::EnemyResource, network_resource::NetworkResource},
+        components::{enemy_component::{Enemy, EnemyMovement}, player_component::Player}, resources::{enemy_resource::EnemyResource, network_resource::NetworkResource},
         systems::{common::remove_the_dead::despawn_the_dead, enemy::move_enemy::move_enemy},
     },
     common::types::protocol::Message,
@@ -11,11 +11,12 @@ use crate::{
 pub fn handle_network_messages(
     network: Res<NetworkResource>,
     mut commands: Commands,
-    enemy_query: Query<(&Parent, &Enemy)>,
+    enemy_query: Query<(&Parent, &Enemy, &mut EnemyMovement)>,
     enemy_query_2: Query<(&Parent, &Enemy), With<Enemy>>,
     query_player: Single<(Entity, &Player)>,
     parent_query: Query<&mut Transform>,
     enemy_resource: ResMut<EnemyResource>,
+    time: Res<Time>,
 ) {
     let mut buf = vec![0; 1024];
     match network.socket.try_recv(&mut buf) {
@@ -43,6 +44,7 @@ pub fn handle_network_messages(
                             rotation,
                             enemy_query,
                             parent_query,
+                            time
                         );
                     }
                     _ => todo!(),
