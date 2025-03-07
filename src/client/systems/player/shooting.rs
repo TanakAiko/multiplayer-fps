@@ -1,7 +1,11 @@
+// use std::time::Instant;
+
+use std::time::Instant;
+
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
-use crate::client::{
+use crate::{client::{
     components::{
         bullet::{Bullet, BulletDirection},
         camera_component::CameraSensitivity,
@@ -9,10 +13,12 @@ use crate::client::{
         player_component::{Player, PlayerShoot},
         world_component::WallModel,
     },
-    resources::enemy_resource::EnemyResource,
-};
+    resources::{enemy_resource::EnemyResource, network_resource::NetworkResource},
+}, common::types::protocol::Message};
 
 use super::step::playsoundshoot;
+
+const UPDATE_FREQUENCY: f32 = 1. / 60.; // 20 Hz ;
 
 pub fn player_shooting(
     mut commands: Commands,
@@ -131,6 +137,7 @@ pub fn handle_wall_collision(
 }
 
 pub fn handle_bullet_collision(
+    mut network: ResMut<NetworkResource>,
     mut commands: Commands,
     bullets: Query<(Entity, &Bullet)>,
     enemies_query: Query<(Entity, &Parent, &Enemy), With<Enemy>>,
@@ -138,6 +145,7 @@ pub fn handle_bullet_collision(
     mut collision_events: EventReader<CollisionEvent>,
     mut enemy_resource: ResMut<EnemyResource>,
     query: Query<(&Parent, &Enemy), With<Enemy>>,
+    query_player: Query<(&Transform, &Player)>,
 ) {
     for collision_event in collision_events.read() {
         if let CollisionEvent::Started(entity1, entity2, _) = collision_event {
@@ -162,12 +170,49 @@ pub fn handle_bullet_collision(
                         //     &enemies_query_2,
                         //     &player_query,
                         // );
+
                         let all_dead_players = &enemy_resource.dead_players.clone();
                         println!(
-                            "all_dead_players.len(): {}  ||  query.iter().count(): {}",
+                            "ALL_dead_players.LEN(): {}  ||  QUERY.iter().COUNT(): {}",
                             all_dead_players.len(),
                             query.iter().count()
                         );
+
+                        enemy_resource
+                            .dead_players
+                            .push(player_entity.2.name.clone());
+
+                        
+
+
+
+
+                            if network.last_sent.elapsed().as_secs_f32() <= UPDATE_FREQUENCY {
+                                return;
+                             }
+                        
+                            if let Ok((transform, _)) = query_player.get_single() {
+                                let dead_players = enemy_resource.dead_players.clone();
+                                let update = Message::PlayerUpdateSending {
+                                    position: transform.translation,
+                                    rotation: transform.rotation,
+                                    all_dead_players: dead_players.clone(),
+                                };
+                                // println!("dead players sender {:?}", dead_players);
+                        
+                                let encoded = bincode::serialize(&update).unwrap();
+                                if let Err(e) = network.socket.try_send(&encoded) {
+                                    error!("Erreur d'envoi: {}", e);
+                                }
+                            }
+                            
+                            network.last_sent = Instant::now();
+
+
+
+
+
+
                         if all_dead_players.len() >= query.iter().count() {
                             // spawn_game_over_ui(commands.reborrow());
                             println!("Nahhh, I'd Win !!! 😎🔥");
@@ -175,10 +220,6 @@ pub fn handle_bullet_collision(
                             std::thread::sleep(std::time::Duration::from_secs(2));
                             std::process::exit(0);
                         }
-
-                        enemy_resource
-                            .dead_players
-                            .push(player_entity.2.name.clone());
                     }
                 }
             }

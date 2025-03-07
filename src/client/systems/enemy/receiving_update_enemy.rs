@@ -28,6 +28,7 @@ pub fn handle_network_messages(
                     Message::DeadPlayer { all_dead_players } => {
                         let is_new_dead = add_dead_player_if_not_exists(enemy_resource, all_dead_players.clone());
                         if is_new_dead {
+                            println!("***************** DeadPlayer");
                             despawn_the_dead(commands.reborrow(), &all_dead_players, &enemy_query_2, &query_player);
                         }
                     }

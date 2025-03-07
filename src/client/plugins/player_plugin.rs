@@ -20,13 +20,16 @@ impl Plugin for PlayerPlugin {
                 (
                     rotate_player,
                     move_player,
-                    send_player_updates,
                     player_shooting,
                     update_bullets,
-                    handle_bullet_collision,
                     handle_wall_collision,
                     update_minimap_player,
+                    send_player_updates,
                 ),
+            )
+            .add_systems(
+                Update,
+                (handle_bullet_collision, send_player_updates).chain(),
             );
     }
 }
