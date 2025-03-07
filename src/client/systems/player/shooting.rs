@@ -215,6 +215,12 @@ pub fn handle_bullet_collision(
                             std::thread::sleep(std::time::Duration::from_secs(2));
                             std::process::exit(0);
                         }
+
+                        for (parent, enemy) in query.iter() {
+                            if enemy.name == *player_entity.2.name.clone() {
+                                commands.entity(parent.get()).despawn_recursive();
+                            }
+                        }
                     }
                 }
             }
