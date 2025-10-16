@@ -1,131 +1,233 @@
-# 1. Dépendances et leur rôle
-Voici les bibliothèques principales avec leurs responsabilités dans le projet :
+# Multiplayer FPS - Maze Game
 
-## Bibliothèques principales
-## 1. Bevy
+<div align="center">
 
-- Moteur de jeu ECS (Entity-Component-System) pour la gestion des entités et rendu 3D/2D.
-- Utilisé pour la logique de jeu, le rendu graphique, l’interface utilisateur et la synchronisation du monde.
-## 2. Tokio
+![Rust](https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white)
+![Bevy](https://img.shields.io/badge/Bevy-232326?style=for-the-badge&logo=bevy&logoColor=white)
+![Tokio](https://img.shields.io/badge/Tokio-00ADD8?style=for-the-badge&logo=rust&logoColor=white)
 
-- Gestion des tâches asynchrones, indispensable pour les communications réseau via UDP.
-- Utilisé pour créer et gérer un serveur UDP performant.
-## 3. Serde
+</div>
 
-- Sérialisation et désérialisation des données (JSON ou bincode).
-- Facilite les échanges de données structurées entre le serveur et les clients.
-## 4. Rand
+A multiplayer first-person maze game built with Rust, featuring procedurally generated mazes, real-time networking, and support for 10+ concurrent players.
 
-- Génération procédurale des labyrinthes (algorithmes comme Prim ou Recursive Backtracking).
-## 5. Crossbeam
+</div>
 
-- Pour la communication entre threads (si vous séparez les tâches réseau et le rendu graphique).
-- Assure un échange de données performant entre les sous-systèmes.
-- Bevy FPS Plugin (ou implémentation maison simple)
+## 📸 Screenshots
 
-## 6. Affichage des FPS pour le HUD.
-- Bibliothèques optionnelles
-- Quinn : Si vous souhaitez explorer un protocole basé sur UDP avec des garanties supplémentaires (QUIC).
-- Petgraph : Pour la génération et l’analyse du graphe du labyrinthe (facultatif mais utile pour des labyrinthes complexes).
-# 2. Architecture globale
-### Modules principaux
-Le projet sera divisé en modules distincts :
+<div align="center">
 
-# Module réseau
+![Player View Inside Map](imgs/Screenshot%20from%202025-10-16%2015-28-23.png)
+*First-person view of a player navigating through the procedurally generated maze*
 
-- Responsable de la communication client-serveur via UDP.
-- Sérialisation/désérialisation des messages avec Serde.
-- Maintien de la latence minimale avec gestion des paquets UDP (p. ex., perte de paquets).
-# Module logique de jeu
+</div>
 
-- Gestion des entités du jeu : joueur, labyrinthes, obstacles, niveaux.
-- Génération dynamique des labyrinthes (augmentant en difficulté).
-- Mécanique des collisions, progression, et conditions de victoire.
-# Module graphique
+## 🎮 Features
 
-- Rendu des labyrinthes et du monde.
-- Caméra et mini-carte synchronisées avec les positions des joueurs.
-- Affichage du HUD (FPS, pseudo, niveau).
-# Module client
+<div align="left">
 
-- Gestion de l’interface utilisateur, y compris l'entrée clavier et souris.
-- Intégration avec Bevy pour afficher les positions synchronisées avec le serveur.
-# Module serveur
+- **Multiplayer Support**: Real-time UDP-based networking for 10+ concurrent players
+- **Procedural Generation**: Dynamically generated mazes with increasing difficulty
+- **3D Graphics**: Built with Bevy ECS engine for smooth rendering and game logic
+- **HUD System**: Real-time display of FPS, player names, mini-map, and level information
+- **Client Prediction**: Latency compensation for smooth gameplay
+- **Collision Detection**: Physics-based movement and obstacle interaction
 
-- Maintien de l’état global du jeu (position des joueurs, progression).
-- Diffusion périodique des mises à jour aux clients connectés.
-- Gestion des connexions multiples (au moins 10 joueurs).
-## 3. Organisation des fichiers
-Voici une structure recommandée :
+## 🚀 Getting Started
 
+### Prerequisites
+
+- Rust (latest stable version)
+- Cargo
+
+### Installation
+
+1. Clone the repository:
 ```bash
-src/
-├── main.rs                # Point d'entrée principal.
-├── client.rs              # Code principal du client.
-├── server.rs              # Code principal du serveur.
-├── network/               # Gestion réseau.
-│   ├── udp.rs             # Gestion des connexions UDP.
-│   ├── messages.rs        # Structures de messages réseau.
-├── game/                  # Logique du jeu.
-│   ├── maze.rs            # Génération du labyrinthe.
-│   ├── player.rs          # Gestion des joueurs.
-│   └── levels.rs          # Gestion des niveaux et difficulté.
-├── graphics/              # Rendu graphique.
-│   ├── ui.rs              # Interface utilisateur (HUD, mini-carte).
-│   ├── rendering.rs       # Rendu des labyrinthes et des joueurs.
-├── utils.rs               # Fonctions utilitaires partagées.
-├── Cargo.toml             # Dépendances.
+git clone https://github.com/yourusername/multiplayer-fps.git
+cd multiplayer-fps
 ```
-# 3. Répartition logique des tâches
-### A. Module réseau
-- Responsable : Communication UDP client-serveur.
-#### Tâches principales :
-- Implémentation du serveur UDP avec Tokio.
-- Sérialisation des données (positions des joueurs, état du jeu) avec Serde.
-- Gestion des connexions simultanées (10+ joueurs).
-### B. Module logique de jeu
-Responsable : Génération procédurale et gestion des règles.
-#### Tâches principales :
-- Génération dynamique des labyrinthes (niveau 1, 2, 3).
-- Gestion des collisions et mouvements.
-- Implémentation des conditions de victoire.
-### C. Module graphique
-Responsable : Affichage et interaction utilisateur.
-#### Tâches principales :
-- Rendu des labyrinthes et des positions des joueurs avec Bevy.
-- Synchronisation de la caméra avec les mouvements du joueur.
-- Création du HUD (mini-carte, affichage FPS, pseudo).
-### D. Module client
-Responsable : Gestion des interactions utilisateur.
-#### Tâches principales :
-- Interface en ligne de commande pour demander l’adresse IP et le pseudo.
-- Gestion des entrées utilisateur (déplacement, interactions).
-- Synchronisation avec l’état du serveur (via UDP).
-### E. Module serveur
-Responsable : Gestion centralisée du jeu.
-#### Tâches principales :
-- Maintien de l’état global du jeu (labyrinthe, positions, scores).
-- Gestion des connexions réseau et des mises à jour synchronisées.
-- Diffusion régulière des états aux clients connectés.
-# 4. Points importants pour une intégration cohérente
-Cohérence entre les modules réseau et graphique
 
-- Assurez que le module réseau envoie uniquement les données nécessaires (positions des joueurs, état des labyrinthes).
-- Le module graphique doit être capable de mettre à jour l’affichage à partir des données reçues.
-Synchronisation client-serveur
+2. Build the project:
+```bash
+cargo build --release
+```
 
-- Utilisez des ID uniques pour chaque joueur pour associer les mises à jour.
-- Implémentez une logique de prediction côté client pour masquer les effets de latence.
-Performances et modularité
+### Running the Game
 
-- Séparez clairement les responsabilités des modules pour faciliter les tests unitaires.
-- Optimisez les algorithmes de labyrinthe et minimisez les calculs inutiles dans la boucle principale.
-Testing
+**Start the server:**
+```bash
+cargo run --bin server
+```
 
-## Créez des tests automatisés pour chaque module (connexion réseau, génération du labyrinthe, etc.).
-Résumé des tâches pour l’équipe
-- Développeur A : Réseau (module serveur et UDP client).
-- Développeur B : Logique du jeu (génération des labyrinthes, gestion des règles).
-- Développeur C : Graphisme et rendu (HUD, mini-carte, caméra).
-- Développeur D : Intégration et tests (synchronisation client-serveur, fluidité).
-## Avec cette approche, vous pouvez avancer efficacement tout en garantissant une architecture maintenable et évolutive.
+**Start a client:**
+```bash
+cargo run --bin client
+```
+
+You'll be prompted to enter:
+- Server IP address
+- Your player username
+
+## 📦 Dependencies
+
+### Core Libraries
+
+| Library | Purpose |
+|---------|---------|
+| **Bevy** | ECS game engine for entity management, 3D/2D rendering, and game logic |
+| **Tokio** | Async runtime for high-performance UDP network communication |
+| **Serde** | Data serialization/deserialization for network messages |
+| **Rand** | Procedural maze generation using algorithms like Prim or Recursive Backtracking |
+| **Crossbeam** | Thread-safe communication between networking and rendering subsystems |
+
+### Optional Libraries
+
+- **Quinn**: QUIC protocol support for enhanced UDP with reliability guarantees
+- **Petgraph**: Graph analysis for complex maze generation and pathfinding
+
+## 🏗️ Architecture
+
+### Project Structure
+
+```
+src/
+├── lib.rs                          # Library root
+├── bin/
+│   ├── client.rs                   # Client entry point
+│   └── server.rs                   # Server entry point
+├── client/
+│   ├── mod.rs
+│   ├── udp.rs                      # Client UDP networking
+│   ├── components/                 # ECS components
+│   │   ├── animation_component.rs
+│   │   ├── bullet.rs
+│   │   ├── camera_component.rs
+│   │   ├── enemy_component.rs
+│   │   ├── flag_component.rs
+│   │   ├── player_component.rs
+│   │   ├── rendering_component.rs
+│   │   └── world_component.rs
+│   ├── plugins/                    # Bevy plugins
+│   │   ├── enemy_plugin.rs
+│   │   ├── player_plugin.rs
+│   │   └── world_plugin.rs
+│   ├── resources/                  # Game resources
+│   │   ├── animation_resource.rs
+│   │   ├── enemy_resource.rs
+│   │   ├── network_resource.rs
+│   │   ├── player_resource.rs
+│   │   └── world_resource.rs
+│   └── systems/                    # Game systems
+│       ├── camera/
+│       ├── common/
+│       ├── enemy/
+│       ├── page/
+│       ├── player/
+│       └── world/
+├── server/
+│   ├── mod.rs
+│   ├── udp.rs                      # Server UDP networking
+│   └── utils/
+│       └── exeption.rs
+└── common/
+    ├── types/
+    │   ├── game_state.rs           # Shared game state
+    │   └── protocol.rs             # Network protocol definitions
+    └── utils/
+        └── socket_utils.rs         # Socket utilities
+```
+
+### Module Responsibilities
+
+#### 🌐 Network Module
+- **Purpose**: Client-server communication via UDP
+- **Responsibilities**:
+  - UDP server implementation using Tokio
+  - Message serialization/deserialization with Serde
+  - Handling 10+ simultaneous connections
+  - Packet loss management and latency optimization
+
+#### 🎯 Game Logic Module
+- **Purpose**: Core game mechanics and rules
+- **Responsibilities**:
+  - Entity management (players, mazes, obstacles, levels)
+  - Procedural maze generation with increasing difficulty
+  - Collision detection and movement mechanics
+  - Win condition implementation
+
+#### 🖼️ Graphics Module
+- **Purpose**: Rendering and visual presentation
+- **Responsibilities**:
+  - Maze and world rendering
+  - Camera synchronization with player movement
+  - HUD display (FPS counter, mini-map, player name, level)
+  - Real-time position updates from server state
+
+#### 💻 Client Module
+- **Purpose**: User interaction and input handling
+- **Responsibilities**:
+  - Command-line interface for connection setup
+  - Keyboard and mouse input processing
+  - Server state synchronization
+  - Client-side prediction for latency compensation
+
+#### 🖥️ Server Module
+- **Purpose**: Centralized game state management
+- **Responsibilities**:
+  - Global game state maintenance (positions, scores, maze state)
+  - Network connection management
+  - Periodic state broadcasting to connected clients
+  - Player session management
+
+## 🔧 Development Guidelines
+
+### Integration Best Practices
+
+**Network-Graphics Consistency**
+- Network module sends only essential data (player positions, maze state)
+- Graphics module updates display based on received data
+- Use efficient data structures to minimize bandwidth
+
+**Client-Server Synchronization**
+- Unique player IDs for state association
+- Client-side prediction to mask latency
+- Server authoritative for game state
+- Periodic reconciliation of client predictions
+
+**Performance & Modularity**
+- Clear separation of concerns between modules
+- Unit tests for each module
+- Optimized maze algorithms
+- Minimal computations in main game loop
+
+### Testing Strategy
+
+Create automated tests for:
+- Network connectivity and message passing
+- Maze generation algorithms
+- Collision detection
+- Player movement
+- State synchronization
+
+## 🤝 Contributing
+
+Contributions are welcome! Here are some ways you can contribute:
+
+- **Add New Features**: Implement power-ups, weapons, or game modes
+- **Improve Maze Generation**: Enhance algorithms for better maze layouts and difficulty scaling
+- **Optimize Networking**: Reduce latency, improve packet handling, or add TCP fallback
+- **Enhance Graphics**: Add better textures, lighting effects, or visual feedback
+- **Improve Collision Detection**: Fine-tune physics and movement mechanics
+- **Add Tests**: Write unit and integration tests for critical systems
+- **Fix Bugs**: Report and fix issues in gameplay, networking, or rendering
+- **Improve Documentation**: Enhance code comments, add tutorials, or create guides
+
+---
+
+<div align="center">
+
+**⭐ Star this repository if you found it helpful! ⭐**
+
+Made with ❤️ from 🇸🇳
+
+</div>
